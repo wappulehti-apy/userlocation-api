@@ -1,6 +1,10 @@
 from flask import Flask, jsonify
+from flask_basicauth import BasicAuth
+
 app = Flask(__name__)
-app.config.from_object('config.Config')
+app.config.from_objAect('config.Config')
+
+basic_auth = BasicAuth(app)
 
 
 def geojson(latitude, longitude, name):

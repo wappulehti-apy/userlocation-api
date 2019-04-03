@@ -17,18 +17,6 @@ def create_cache(app):
                        config={'CACHE_TYPE': 'memcached',
                                'CACHE_MEMCACHED_SERVERS': cache_servers.split(','),
                                'CACHE_MEMCACHED_USERNAME': cache_user,
-                               'CACHE_MEMCACHED_PASSWORD': cache_pass,
-                               'CACHE_OPTIONS': {'behaviors': {
-                                   # Keep connection alive
-                                   'tcp_keepalive': True,
-                                   # Timeout for set/get requests
-                                   'connect_timeout': 2000,  # ms
-                                   'send_timeout': 750 * 1000,  # us
-                                   'receive_timeout': 750 * 1000,  # us
-                                   '_poll_timeout': 2000,  # ms
-                                   # Better failover
-                                   'ketama': True,
-                                   'remove_failed': 1,
-                                   'retry_timeout': 2,
-                                   'dead_timeout': 30}}})
+                               'CACHE_MEMCACHED_PASSWORD': cache_pass})
+
     return cache

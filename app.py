@@ -19,7 +19,7 @@ def create_app():
 
 
 def set_location(cache, location):
-    cache.set('location', location, timeout=5 * 60)
+    cache.set('location', location, 5 * 60)
 
 
 def get_location(cache):

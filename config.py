@@ -6,10 +6,13 @@ class Config(object):
     DEBUG = False
     TESTING = False
     CSRF_ENABLED = True
-    BASIC_AUTH_FORCE = True
+    load_dotenv(verbose=True)
+
+    # Disable auth in development
+    if os.getenv('FLASK_ENV') != 'development':
+        BASIC_AUTH_FORCE = True
 
     # From ENV variables
-    load_dotenv(verbose=True)
     SECRET_KEY = os.getenv("FLASK_SECRET_KEY") or "this-really-needs-to-be-changed"
     BASIC_AUTH_USERNAME = os.getenv("BASIC_AUTH_USERNAME")
     BASIC_AUTH_PASSWORD = os.getenv("BASIC_AUTH_PASSWORD")

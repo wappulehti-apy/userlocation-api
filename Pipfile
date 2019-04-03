@@ -10,6 +10,7 @@ autopep8 = "*"
 flask = "*"
 gunicorn = "*"
 python-dotenv = "*"
+flask-basicauth = "*"
 
 [requires]
 python_version = "3.7"

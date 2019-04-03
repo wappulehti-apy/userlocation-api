@@ -13,8 +13,9 @@ def create_cache(app):
     else:
         cache_user = os.environ.get('MEMCACHIER_USERNAME') or ''
         cache_pass = os.environ.get('MEMCACHIER_PASSWORD') or ''
+        app.logger.info('username {}'.format(cache_user))
         cache.init_app(app,
-                       config={'CACHE_TYPE': 'memcached',
+                       config={'CACHE_TYPE': 'saslmemcached',
                                'CACHE_MEMCACHED_SERVERS': cache_servers.split(','),
                                'CACHE_MEMCACHED_USERNAME': cache_user,
                                'CACHE_MEMCACHED_PASSWORD': cache_pass})

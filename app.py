@@ -10,8 +10,6 @@ from location import Location, LocationError
 def create_app():
     app = Flask(__name__)
     app.config.from_object(os.environ['APP_SETTINGS'])
-    if app.config['DEVELOP']:
-        app.logger.setLevel(logging.DEBUG)
 
     basic_auth = BasicAuth(app)
     cache = create_cache(app)

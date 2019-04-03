@@ -1,4 +1,5 @@
 import sys
+import os
 import logging
 from flask import Flask, jsonify, request
 from flask_basicauth import BasicAuth
@@ -8,10 +9,7 @@ from location import Location, LocationError
 
 def create_app():
     app = Flask(__name__)
-    if "pytest" in sys.modules:
-        app.config.from_object('config.Testing')
-    else:
-        app.config.from_object('config.Config')
+    app.config.from_object(os.environ['APP_SETTINGS'])
 
     basic_auth = BasicAuth(app)
     cache = create_cache(app)

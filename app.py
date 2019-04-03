@@ -18,7 +18,7 @@ def geojson(latitude, longitude, name):
 
 @app.route('/')
 def get_cooridnates():
-    response = geojson(0, 0, app.config['GEO_NAME])
+    response = geojson(0, 0, app.config['GEO_NAME'])
     return jsonify(response)
 
 

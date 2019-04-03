@@ -39,10 +39,12 @@ def isFloat(f):
 
 
 def validate_location(location):
-    if location.lat is None or location.long is None:
-        raise KeyError('longitude or lat missing')
+    if location.lat is None:
+        raise KeyError("lat is missing")
+    if location.long is None:
+        raise KeyError("longitude is missing")
     if not isFloat(location.lat) or not isFloat(location.long):
-        raise TypeError('coordinates are not floats')
+        raise TypeError("coordinates are not floats")
     return True
 
 
@@ -73,13 +75,17 @@ def get_cooridnates():
 
 @app.route('/set')
 def set_coordinates():
-    location = Location(long=request.args.get('lat'), lat=request.args.get('longitude'))
-
     try:
+        location = Location(
+            long=float(request.args.get('lat')),
+            lat=float(request.args.get('longitude'))
+        )
         validate_location(location)
-    except BaseException as err:
+    except (ValueError, KeyError, TypeError) as err:
         app.logger.error('invalid location set from %s: %s', request.remote_addr, err)
         return jsonify({'error': True, 'message': 'invalid location', 'detail': str(err)}), 400
+    except BaseException as err:
+        return jsonify({'error': True, 'message': 'unknown error', 'detail': str(err)}), 500
 
     set_location(cache, location)
     app.logger.info('location set (%s) to long==%f, lat=%f', request.remote_addr, location.long, location.lat)

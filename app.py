@@ -1,5 +1,6 @@
 import sys
-from flask import Flask, jsonify
+import logging
+from flask import Flask, jsonify, request
 from flask_basicauth import BasicAuth
 from cache import create_cache
 from location import Location, LocationError
@@ -29,6 +30,22 @@ def get_location(cache):
     return location
 
 
+def isFloat(f):
+    try:
+        float(f)
+        return True
+    except BaseException as err:
+        return False
+
+
+def validate_location(location):
+    if location.lat is None or location.long is None:
+        raise KeyError('longitude or lat missing')
+    if not isFloat(location.lat) or not isFloat(location.long):
+        raise TypeError('coordinates are not floats')
+    return True
+
+
 def geojson(location, name):
     return {
         "type": "Feature",
@@ -50,7 +67,23 @@ def get_cooridnates():
         response = geojson(location, app.config['GEO_NAME'])
     except LocationError as err:
         response = {'error': True, 'message': str(err)}
+    app.logger.info('location query from %s', request.remote_addr)
     return jsonify(response)
+
+
+@app.route('/set')
+def set_coordinates():
+    location = Location(long=request.args.get('lat'), lat=request.args.get('longitude'))
+
+    try:
+        validate_location(location)
+    except BaseException as err:
+        app.logger.error('invalid location set from %s: %s', request.remote_addr, err)
+        return jsonify({'error': True, 'message': 'invalid location', 'detail': str(err)}), 400
+
+    set_location(cache, location)
+    app.logger.info('location set (%s) to long==%f, lat=%f', request.remote_addr, location.long, location.lat)
+    return jsonify({'success': True})
 
 
 if __name__ == '__main__':

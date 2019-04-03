@@ -1,7 +1,8 @@
-import os
 import sys
 from flask import Flask, jsonify
 from flask_basicauth import BasicAuth
+from cache import create_cache
+from location import Location, LocationError
 
 
 def create_app():
@@ -12,16 +13,28 @@ def create_app():
         app.config.from_object('config.Config')
 
     basic_auth = BasicAuth(app)
+    cache = create_cache(app)
 
-    return app
+    return app, cache
 
 
-def geojson(latitude, longitude, name):
+def set_location(cache, location):
+    cache.set('location', location, timeout=5 * 60)
+
+
+def get_location(cache):
+    location = cache.get('location')
+    if location is None:
+        raise LocationError('location not updated')
+    return location
+
+
+def geojson(location, name):
     return {
         "type": "Feature",
         "geometry": {
             "type": "Point",
-            "coordinates": [latitude, longitude]
+            "coordinates": [location.long, location.lat]
         },
         "properties": {
             "name": name
@@ -29,10 +42,14 @@ def geojson(latitude, longitude, name):
     }
 
 
-app = create_app()
+app, cache = create_app()
 @app.route('/')
 def get_cooridnates():
-    response = geojson(0, 0, app.config['GEO_NAME'])
+    try:
+        location = get_location(cache)
+        response = geojson(location, app.config['GEO_NAME'])
+    except LocationError as err:
+        response = {'error': True, 'message': str(err)}
     return jsonify(response)
 
 

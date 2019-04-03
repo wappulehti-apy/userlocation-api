@@ -18,6 +18,7 @@ class Config(object):
 class Develop(Config):
     load_dotenv(verbose=True)
     BASIC_AUTH_FORCE = False
+    DEVELOP = True
 
 
 class Testing(Config):

@@ -13,7 +13,7 @@ gunicorn = "*"
 python-dotenv = "*"
 flask-basicauth = "*"
 flask-caching = "*"
-pylibmc = "*"
+python-binary-memcached = "*"
 
 [requires]
 python_version = "3.7"

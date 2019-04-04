@@ -76,8 +76,8 @@ def get_cooridnates():
 def set_coordinates():
     try:
         location = Location(
-            long=float(request.args.get('lat')),
-            lat=float(request.args.get('longitude'))
+            long=float(request.args.get('longitude')),
+            lat=float(request.args.get('lat'))
         )
         validate_location(location)
     except (ValueError, KeyError, TypeError) as err:

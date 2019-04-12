@@ -21,6 +21,19 @@ def client():
     # ctx.pop()
 
 
+@pytest.fixture(scope="function")
+def db_with_data(client):
+    location1 = Location(1, latitude=60.16952, longitude=24.93545, initials="A A")
+    location2 = Location(2, latitude=59.33258, longitude=18.0649, initials="B B")
+    with app.app_context():
+        db.session.add(location1)
+        db.session.add(location2)
+        db.session.commit()
+    yield
+    with app.app_context():
+        db.session.rollback()
+
+
 @pytest.fixture
 def dummylocation():
     return
@@ -50,6 +63,13 @@ def test_response_is_json(client):
     r = client.get('/', headers=with_auth())
     assert r.headers["Content-Type"] == "application/json"
 
+
+def test_get_locations(client, db_with_data):
+    r = client.get('/', headers=with_auth())
+    assert r.get_json() == {'locations': [
+        {'initials': 'A A', 'location': {'lat': 60.16952, 'lon': 24.93545}},
+        {'initials': 'B B', 'location': {'lat': 59.33258, 'lon': 18.0649}}
+    ]}
 
 # def test_response_schema(client, dummylocation):
 #     r = client.get('/', headers=with_auth())

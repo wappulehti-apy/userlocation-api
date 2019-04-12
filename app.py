@@ -3,18 +3,21 @@ import os
 import logging
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import SQLAlchemyError
 from flask_basicauth import BasicAuth
 from flask_migrate import Migrate
 
+from database import db
 from cache import create_cache
-from location import Location, LocationError
+from location import LocationError
+from models import Location
 
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(os.environ['APP_SETTINGS'])
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    db = SQLAlchemy(app)
+    db.init_app(app)
     migrate = Migrate(app, db)
 
     app.logger.setLevel(logging.DEBUG)
@@ -69,32 +72,37 @@ def geojson(location, name):
 
 app, cache, db, migrate = create_app()
 @app.route('/')
-def get_cooridnates():
+def get_locations():
     try:
-        location = get_location(cache)
-        response = geojson(location, app.config['GEO_NAME'])
+        locations = Location.query.all()
+        response = {'locations': [l.to_simple_json() for l in locations]}
     except LocationError as err:
         response = {'error': True, 'message': str(err)}
     app.logger.info('location query from %s', request.remote_addr)
     return jsonify(response)
 
 
-@app.route('/set')
-def set_coordinates():
+@app.route('/add')
+def add_location():
     try:
-        location = Location(
-            long=float(request.args.get('longitude')),
-            lat=float(request.args.get('lat'))
-        )
-        validate_location(location)
+        longitude = float(request.args.get('longitude')),
+        latitude = float(request.args.get('latitude'))
+        location = Location(1, latitude=10, longitude=50)
+        # Perform upsert with merge()
+        db.session.merge(location)
+        db.session.commit()
+        # validate_location(location)
+    except SQLAlchemyError as err:
+        app.logger.error('sqlalchemy error from %s: %s', request.remote_addr, err)
+        error_detail = type(err.__dict__['orig']).__name__
+        return jsonify({'error': True, 'message': 'cannot insert to database', 'detail': error_detail}), 500
     except (ValueError, KeyError, TypeError) as err:
         app.logger.error('invalid location set from %s: %s', request.remote_addr, err)
         return jsonify({'error': True, 'message': 'invalid location', 'detail': str(err)}), 400
     except BaseException as err:
         return jsonify({'error': True, 'message': 'unknown error', 'detail': str(err)}), 500
 
-    set_location(cache, location)
-    app.logger.info('location set (%s) to long==%f, lat=%f', request.remote_addr, location.long, location.lat)
+    app.logger.info('location set (%s) to lon==%f, lat=%f', request.remote_addr, location.longitude, location.latitude)
     return jsonify({'success': True})
 
 

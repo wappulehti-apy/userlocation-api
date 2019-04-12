@@ -7,8 +7,7 @@ services:
     volumes:
      - .:/app
     environment:
-     - "DATABASE_URL=postgres://postgres:@postgres/postgres"
-    #  - "DEVELOPMENT=1"
+     - "APP_SETTINGS=config.Develop"
     depends_on:
       - postgres
     ports:

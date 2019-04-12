@@ -13,18 +13,20 @@ class Config(object):
     BASIC_AUTH_USERNAME = os.getenv("BASIC_AUTH_USERNAME")
     BASIC_AUTH_PASSWORD = os.getenv("BASIC_AUTH_PASSWORD")
     GEO_NAME = os.getenv("GEO_NAME") or 'default'
-    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
 
 
 class Develop(Config):
     load_dotenv(verbose=True)
     BASIC_AUTH_FORCE = False
+    SQLALCHEMY_DATABASE_URI = "postgres://postgres:@postgres/postgres"
     DEVELOP = True
 
 
 class Testing(Config):
     TESTING = True
     SECRET_KEY = "mysecretley"
+    SQLALCHEMY_DATABASE_URI = "sqlite://"
     BASIC_AUTH_USERNAME = "myusername"
     BASIC_AUTH_PASSWORD = "mypassword"
     GEO_NAME = "myname"

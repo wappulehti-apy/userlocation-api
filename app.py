@@ -16,7 +16,9 @@ from models import Location
 def create_app():
     app = Flask(__name__)
     app.config.from_object(os.environ['APP_SETTINGS'])
+    app.logger.info(f'Loaded APP_SETTINGS from {os.environ["APP_SETTINGS"]}')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.logger.info(f'Connecting to DB at {app.config["SQLALCHEMY_DATABASE_URI"]}')
     db.init_app(app)
     migrate = Migrate(app, db)
 

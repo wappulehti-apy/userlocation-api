@@ -13,6 +13,7 @@ class Config(object):
     BASIC_AUTH_USERNAME = os.getenv("BASIC_AUTH_USERNAME")
     BASIC_AUTH_PASSWORD = os.getenv("BASIC_AUTH_PASSWORD")
     GEO_NAME = os.getenv("GEO_NAME") or 'default'
+    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
 
 class Develop(Config):

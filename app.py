@@ -77,19 +77,21 @@ app, cache, db, migrate = create_app()
 def get_locations():
     try:
         locations = Location.query.all()
-        response = {'locations': [l.to_simple_json() for l in locations]}
+        response = {'sellers': [l.to_simple_json() for l in locations]}
     except LocationError as err:
         response = {'error': True, 'message': str(err)}
     app.logger.info('location query from %s', request.remote_addr)
     return jsonify(response)
 
 
-@app.route('/add')
-def add_location():
+@app.route('/set/<int:id>')
+def add_location(id):
     try:
         longitude = float(request.args.get('longitude')),
         latitude = float(request.args.get('latitude'))
-        location = Location(1, latitude=10, longitude=50)
+        initials = str(request.args.get('initials'))
+        app.logger.info(initials)
+        location = Location(id, latitude=10, longitude=50, initials=initials)
         # Perform upsert with merge()
         db.session.merge(location)
         db.session.commit()

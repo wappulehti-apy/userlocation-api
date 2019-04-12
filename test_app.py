@@ -66,9 +66,9 @@ def test_response_is_json(client):
 
 def test_get_locations(client, db_with_data):
     r = client.get('/', headers=with_auth())
-    assert r.get_json() == {'locations': [
-        {'initials': 'A A', 'location': {'lat': 60.16952, 'lon': 24.93545}},
-        {'initials': 'B B', 'location': {'lat': 59.33258, 'lon': 18.0649}}
+    assert r.get_json() == {'sellers': [
+        {'id': 'R3Ea3', 'initials': 'A A', 'location': {'lat': '60.16952000', 'lon': '24.93545000'}},
+        {'id': 'O6zkQ', 'initials': 'B B', 'location': {'lat': '59.33258000', 'lon': '18.06490000'}}
     ]}
 
 # def test_response_schema(client, dummylocation):

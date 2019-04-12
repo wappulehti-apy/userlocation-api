@@ -11,4 +11,4 @@ USER webuser
 ADD . /app
 
 # CMD bash -c "alembic upgrade head && python run.py"
-CMD bash -c "flask run --host=0.0.0.0"
+CMD bash -c "python create_database.py && flask run --host=0.0.0.0"

@@ -9,7 +9,7 @@ def create_cache(app):
     passw = os.environ.get('MEMCACHIER_PASSWORD', '')
     if servers is None:
         from flask_caching import Cache
-        cache = Cache() 
+        cache = Cache()
         # Fall back to simple in memory cache (development)
         cache.init_app(app, config={'CACHE_TYPE': 'simple'})
         return cache

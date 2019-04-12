@@ -4,6 +4,8 @@ import logging
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_basicauth import BasicAuth
+from flask_migrate import Migrate
+
 from cache import create_cache
 from location import Location, LocationError
 
@@ -13,12 +15,14 @@ def create_app():
     app.config.from_object(os.environ['APP_SETTINGS'])
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db = SQLAlchemy(app)
+    migrate = Migrate(app, db)
+
     app.logger.setLevel(logging.DEBUG)
 
     basic_auth = BasicAuth(app)
     cache = create_cache(app)
 
-    return app, cache, db
+    return app, cache, db, migrate
 
 
 def set_location(cache, location):
@@ -63,7 +67,7 @@ def geojson(location, name):
     }
 
 
-app, cache, db = create_app()
+app, cache, db, migrate = create_app()
 @app.route('/')
 def get_cooridnates():
     try:

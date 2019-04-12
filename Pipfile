@@ -19,6 +19,7 @@ flask-sqlalchemy = "*"
 pip = "*"
 psycopg2-binary = "*"
 flask-migrate = "*"
+hashids = "*"
 
 [requires]
 python_version = "3.7"

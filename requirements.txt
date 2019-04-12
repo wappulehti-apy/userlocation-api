@@ -7,6 +7,7 @@ flask-migrate==2.4.0
 flask-sqlalchemy==2.3.2
 flask==1.0.2
 gunicorn==19.9.0
+hashids==1.2.0
 itsdangerous==1.1.0
 jinja2==2.10.1
 mako==1.0.8

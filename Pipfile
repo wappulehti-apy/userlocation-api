@@ -17,6 +17,7 @@ python-binary-memcached = "*"
 flask-sqlalchemy = "*"
 pip = "*"
 psycopg2-binary = "*"
+flask-migrate = "*"
 
 [requires]
 python_version = "3.7"

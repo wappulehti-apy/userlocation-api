@@ -1,39 +1,19 @@
-# GPS logger http server
+# GPS tracker for multiple users
 
-GPS logger is a ready-to-deploy app to use with [GPSLogger for Android](https://gpslogger.app/) in order to serve a realtime location API. This readme describes an example Heroku setup.
-
-
-## Installation
-
-Clone the repository and use [pipenv](https://pipenv.readthedocs.io/en/latest/) or [pip](https://pip.pypa.io/en/stable/) to install dependencies.
-
-```bash
-git clone https://github.com/gamgi/gpslogger-http-server.git
-pip install foobar
-```
+Simple app for setting and getting locations based on user ids.
 
 # Configuration
 The following environment variables are available:
 - `BASIC_AUTH_USERNAME` specifies username for HTTP basic auth
 - `BASIC_AUTH_PASSWORD` specifies password for HTTP basic auth
-- `GEO_NAME` Name for tracked object (optional)
 
-
-## Deployment to Heroku (example)
-### Prerequisites
-
-Sign upp for an heorku account, downlaod the heroku CLI and log in. If you intend to run locally, you also need to install `libmemcached`.
-
-### Create an application
-
-```bash
-heroku create --region eu <myapp>
-heroku addons:create memcachier:dev
-```
+TODO
 
 ### Configuration
 
-TODO
+```bash
+cp .env.sample .env
+```
 
 ### Development
 

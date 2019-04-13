@@ -49,27 +49,8 @@ def isFloat(f):
         return False
 
 
-def validate_location(location):
-    if location.lat is None:
-        raise KeyError("lat is missing")
-    if location.long is None:
-        raise KeyError("longitude is missing")
-    if not isFloat(location.lat) or not isFloat(location.long):
-        raise TypeError("coordinates are not floats")
-    return True
-
-
-def geojson(location, name):
-    return {
-        "type": "Feature",
-        "geometry": {
-            "type": "Point",
-            "coordinates": [location.long, location.lat]
-        },
-        "properties": {
-            "name": name
-        }
-    }
+def validate_location(longitude, latitude):
+    pass
 
 
 app, cache, db, migrate = create_app()
@@ -85,17 +66,17 @@ def get_locations():
 
 
 @app.route('/set/<int:id>')
-def add_location(id):
+def set_location(id):
     try:
-        longitude = float(request.args.get('longitude')),
         latitude = float(request.args.get('latitude'))
+        longitude = float(request.args.get('longitude'))
         initials = str(request.args.get('initials'))
-        app.logger.info(initials)
-        location = Location(id, latitude=10, longitude=50, initials=initials)
+        validate_location(longitude, latitude)
+
+        location = Location(id, latitude=latitude, longitude=longitude, initials=initials)
         # Perform upsert with merge()
         db.session.merge(location)
         db.session.commit()
-        # validate_location(location)
     except SQLAlchemyError as err:
         app.logger.error('sqlalchemy error from %s: %s', request.remote_addr, err)
         error_detail = type(err.__dict__['orig']).__name__

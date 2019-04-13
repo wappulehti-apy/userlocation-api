@@ -8,30 +8,17 @@ from database import db
 from models import Location
 
 
-@pytest.fixture
-def client():
-    # app.config.from_object('config.Testing')
-    client = app.test_client()
-    # Establish an application context before running the tests.
-    # ctx = app.app_context()
-    # ctx.push()
-    with app.app_context():
-        db.create_all()
-    yield client
-    # ctx.pop()
-
-
 @pytest.fixture(scope="function")
-def db_with_data(client):
+def db_with_data(db_session):
     location1 = Location(1, latitude=60.16952, longitude=24.93545, initials="A A")
     location2 = Location(2, latitude=59.33258, longitude=18.0649, initials="B B")
-    with app.app_context():
-        db.session.add(location1)
-        db.session.add(location2)
-        db.session.commit()
+    db_session.add(location1)
+    db_session.add(location2)
+    db_session.commit()
+
     yield
-    with app.app_context():
-        db.session.rollback()
+
+    # Automatically rolled back by pytest-flask-sqlalchemy
 
 
 @pytest.fixture
@@ -64,22 +51,51 @@ def test_response_is_json(client):
     assert r.headers["Content-Type"] == "application/json"
 
 
-def test_get_locations(client, db_with_data):
+def test_get_locations(client, db_session, db_with_data):
     r = client.get('/', headers=with_auth())
     assert r.get_json() == {'sellers': [
         {'id': 'R3Ea3', 'initials': 'A A', 'location': {'lat': '60.16952000', 'lon': '24.93545000'}},
         {'id': 'O6zkQ', 'initials': 'B B', 'location': {'lat': '59.33258000', 'lon': '18.06490000'}}
     ]}
 
-# def test_response_schema(client, dummylocation):
-#     r = client.get('/', headers=with_auth())
-#     assert r.get_json() == {
-#         "type": "Feature",
-#         "geometry": {
-#             "type": "Point",
-#             "coordinates": [60.0, 65.5]
-#         },
-#         "properties": {
-#             "name": "dummy"
-#         }
-#     }
+
+def test_set_location(client, db_session):
+    user_id = 123
+    r = client.get(f'/set/{user_id}?latitude=60.16952&longitude=24.93545&initials=B%20A', headers=with_auth())
+    locations = Location.query.all()
+    assert len(locations) == 1
+    assert locations[0].id == user_id
+    assert locations[0].initials == 'B A'
+    assert locations[0].latitude == 60.16952
+    assert locations[0].longitude == 24.93545
+
+
+def test_tests_dont_leak(client, db_session):
+    locations = Location.query.all()
+    assert len(locations) == 0
+
+# def test_location_expires(client, db_with_data):
+#     pass
+
+
+def test_set_location_updates_existing(client, db_session, db_with_data):
+    original = Location.query.get(1)
+    assert original.longitude == 24.93545
+    assert original.initials == "A A"
+    r = client.get(f'/set/1?latitude=60.16952&longitude=30.00000&initials=B%20B', headers=with_auth())
+    new = Location.query.get(1)
+    assert new.longitude == 30.00000
+    assert new.initials == "B B"
+
+
+def test_empty_response(client):
+    r = client.get('/', headers=with_auth())
+    assert r.get_json() == {'sellers': []}
+
+
+def test_response_schema(client, db_session, db_with_data):
+    r = client.get('/', headers=with_auth())
+    assert r.get_json() == {'sellers': [
+        {'id': 'R3Ea3', 'initials': 'A A', 'location': {'lat': '60.16952000', 'lon': '24.93545000'}},
+        {'id': 'O6zkQ', 'initials': 'B B', 'location': {'lat': '59.33258000', 'lon': '18.06490000'}}
+    ]}

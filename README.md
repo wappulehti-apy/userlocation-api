@@ -58,9 +58,9 @@ $ curl "localhost:5000/"
 
 ## Contributing
 
-Lint using autopep8 or similar.
+Lint your code
 ```bash
-pipenv run autopep8 --in-place --aggressive --aggressive --recursive --max-line-length 250 .
+pipenv run lint
 ```
 
 Test using pytest

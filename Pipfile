@@ -24,3 +24,6 @@ hashids = "*"
 
 [requires]
 python_version = "3.7"
+
+[scripts]
+lint = "autopep8 --in-place --aggressive --aggressive --recursive --max-line-length 250 ."

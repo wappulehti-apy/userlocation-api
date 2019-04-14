@@ -16,8 +16,8 @@ class Location(db.Model):
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=False)
     public_id = Column(String, nullable=False)
     created_date = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
-    latitude = db.Column(Numeric(precision=8, asdecimal=False, decimal_return_scale=None))
-    longitude = db.Column(Numeric(precision=8, asdecimal=False, decimal_return_scale=None))
+    latitude = db.Column(Numeric(precision=9, scale=7, asdecimal=False, decimal_return_scale=None))
+    longitude = db.Column(Numeric(precision=9, scale=7, asdecimal=False, decimal_return_scale=None))
     initials = Column(String, nullable=False)
 
     def __init__(self, id, latitude, longitude, initials):
@@ -33,6 +33,6 @@ class Location(db.Model):
     def to_simple_json(self):
         return {
             'id': self.public_id,
-            'location': {'lat': f"{self.latitude:.8f}", 'lon': f"{self.longitude:.8f}"},
+            'location': {'lat': self.latitude, 'lon': self.longitude},
             'initials': self.initials,
         }

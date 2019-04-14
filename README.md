@@ -28,6 +28,7 @@ heroku config:set BASIC_AUTH_USERNAME=<myusername>
 heroku config:set BASIC_AUTH_PASSWORD=<mypassword>
 heroku config:set FLASK_SECRET_KEY=<mysecretkey>
 heroku config:set SALT=<mysecretsalt>
+heroku config:set WEBHOOK_URL=<webhookurl>
 ```
 
 ### Development

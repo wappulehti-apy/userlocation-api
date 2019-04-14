@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Bot:
+class Webhook:
     def __init__(self, webhook_url):
         self.webhook_url = webhook_url
 

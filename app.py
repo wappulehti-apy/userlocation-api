@@ -12,7 +12,7 @@ from database import db
 from cache import create_cache
 from location import LocationError
 from models import Location
-from botapi import Bot
+from webhook import Webhook
 
 
 def create_app():
@@ -63,10 +63,10 @@ def contactrequest():
         return jsonify({'error': True, 'message': 'you must specify phone-parameter'}), 400
     phone = request.args.get('phone')
 
-    bot = Bot(app.config['BOT_WEBHOOK_URL'])
+    webhook = Webhook(app.config['WEBHOOK_URL'])
     app.logger.info('sending contact request')
 
-    if bot.send_contact_request(phone):
+    if webhook.send_contact_request(phone):
         return jsonify({'success': True})
     else:
         return jsonify({'success': False})

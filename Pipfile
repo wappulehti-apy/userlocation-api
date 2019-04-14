@@ -21,6 +21,7 @@ pip = "*"
 psycopg2-binary = "*"
 flask-migrate = "*"
 hashids = "*"
+requests = "*"
 
 [requires]
 python_version = "3.7"

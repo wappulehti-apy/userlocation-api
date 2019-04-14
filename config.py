@@ -6,7 +6,6 @@ class Config(object):
     DEBUG = False
     TESTING = False
     CSRF_ENABLED = True
-    BASIC_AUTH_FORCE = True
 
     # From ENV variables
     SECRET_KEY = os.getenv("FLASK_SECRET_KEY") or "this-really-needs-to-be-changed"
@@ -18,7 +17,6 @@ class Config(object):
 
 class Develop(Config):
     load_dotenv(verbose=True)
-    BASIC_AUTH_FORCE = False
     SQLALCHEMY_DATABASE_URI = "postgres://postgres:@postgres/postgres"
     DEVELOP = True
 

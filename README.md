@@ -8,11 +8,26 @@ The following environment variables are available:
 - `BASIC_AUTH_PASSWORD` specifies password for HTTP basic auth
 
 TODO
+# Deployment to Heroku (example)
+### Prerequisites
+
+Sign upp for an heorku account, download the heroku CLI and log in.
+
+### Create an application
+
+```bash
+heroku create --region eu <myapp>
+heroku addons:create heroku-postgresql:hobby-dev
+```
 
 ### Configuration
 
+To set the configuration variables,
 ```bash
-cp .env.sample .env
+heroku config:set BASIC_AUTH_USERNAME=<myusername>
+heroku config:set BASIC_AUTH_PASSWORD=<mypassword>
+heroku config:set FLASK_SECRET_KEY=<mysecretkey>
+heroku config:set SALT=<mysecretsalt>
 ```
 
 ### Development

@@ -3,6 +3,7 @@ import os
 import logging
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+from flask_basicauth import BasicAuth
 from sqlalchemy.exc import SQLAlchemyError
 from flask_basicauth import BasicAuth
 from flask_migrate import Migrate
@@ -22,6 +23,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.logger.info(f'Connecting to DB at {app.config["SQLALCHEMY_DATABASE_URI"]}')
     db.init_app(app)
+    basic_auth = BasicAuth(app)
     migrate = Migrate(app, db)
 
     app.logger.setLevel(logging.DEBUG)
@@ -29,11 +31,7 @@ def create_app():
     basic_auth = BasicAuth(app)
     cache = create_cache(app)
 
-    return app, cache, db, migrate
-
-
-def set_location(cache, location):
-    cache.set('location', location, 5 * 60)
+    return app, cache, db, migrate, basic_auth
 
 
 def get_location(cache):
@@ -55,7 +53,9 @@ def validate_location(longitude, latitude):
     pass
 
 
-app, cache, db, migrate = create_app()
+app, cache, db, migrate, basic_auth = create_app()
+
+
 @app.route('/')
 def get_locations():
     try:
@@ -68,6 +68,7 @@ def get_locations():
 
 
 @app.route('/set/<int:id>')
+@basic_auth.required
 def set_location(id):
     try:
         latitude = float(request.args.get('latitude'))

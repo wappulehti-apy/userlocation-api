@@ -36,13 +36,13 @@ def with_auth(original={}):
     return {**original, **auth}
 
 
-def test_requires_authentication(client):
-    r = client.get('/')
+def test_set_requires_authentication(client):
+    r = client.get('/set/123')
     assert r.status == '401 UNAUTHORIZED'
 
 
-def test_authentication_works(client):
-    r = client.get('/', headers=with_auth())
+def test_set_authentication_works(client, db_session):
+    r = client.get(f'/set/123?latitude=60.0&longitude=24.0&initials=B%20A', headers=with_auth())
     assert r.status == '200 OK'
 
 

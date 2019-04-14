@@ -57,16 +57,20 @@ def validate_location(longitude, latitude):
 app, cache, db, migrate, basic_auth = create_app()
 
 
-@app.route('/contactrequest')
-def contactrequest():
+@app.route('/contactrequest/<string:public_id>')
+def contactrequest(public_id):
     if 'phone' not in request.args:
         return jsonify({'error': True, 'message': 'you must specify phone-parameter'}), 400
     phone = request.args.get('phone')
 
-    webhook = Webhook(app.config['WEBHOOK_URL'])
-    app.logger.info('sending contact request')
+    user = Location.query.filter_by(public_id=public_id).first()
+    if user is None:
+        return jsonify({'error': True, 'message': 'no user found'}), 404
 
-    if webhook.send_contact_request(phone):
+    webhook = Webhook(app.config['WEBHOOK_URL'])
+
+    app.logger.info('sending contact request')
+    if webhook.send_contact_request(user.id, phone):
         return jsonify({'success': True})
     else:
         return jsonify({'success': False})

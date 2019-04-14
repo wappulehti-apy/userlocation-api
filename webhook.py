@@ -8,20 +8,20 @@ class Webhook:
     def __init__(self, webhook_url):
         self.webhook_url = webhook_url
 
-    def send_contact_request(self, contactdetails):
+    def send_contact_request(self, user_id, contactdetails):
         data = {
             "update_id": 999,
             "message": {
                 "message_id": 999,
                 "from": {
-                    "id": 99999999,
+                    "id": user_id,
                     "is_bot": False,
                     "first_name": "System",
                     "username": "system",
                     "language_code": "en"
                 },
                 "chat": {
-                    "id": 99999999,
+                    "id": user_id,
                     "first_name": "System",
                     "username": "system",
                     "type": "private"

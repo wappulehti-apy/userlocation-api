@@ -12,6 +12,7 @@ from database import db
 from cache import create_cache
 from location import LocationError
 from models import Location
+from botapi import Bot
 
 
 def create_app():
@@ -54,6 +55,21 @@ def validate_location(longitude, latitude):
 
 
 app, cache, db, migrate, basic_auth = create_app()
+
+
+@app.route('/contactrequest')
+def contactrequest():
+    if 'phone' not in request.args:
+        return jsonify({'error': True, 'message': 'you must specify phone-parameter'}), 400
+    phone = request.args.get('phone')
+
+    bot = Bot(app.config['BOT_WEBHOOK_URL'])
+    app.logger.info('sending contact request')
+
+    if bot.send_contact_request(phone):
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False})
 
 
 @app.route('/')

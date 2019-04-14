@@ -13,6 +13,7 @@ class Config(object):
     BASIC_AUTH_PASSWORD = os.getenv("BASIC_AUTH_PASSWORD")
     GEO_NAME = os.getenv("GEO_NAME") or 'default'
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    BOT_WEBHOOK_URL = os.getenv('BOT_WEBHOOK_URL')
 
 
 class Develop(Config):

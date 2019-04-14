@@ -68,5 +68,10 @@ Test using pytest
 pipenv run pytest
 ```
 
+## FAQ
+
+How do I connec to the local database running in docker?
+`psql -h localhost -p 9000 -U postgres postgres`
+
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

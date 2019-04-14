@@ -1,5 +1,5 @@
-from __future__ import with_statement  # NOQA
 from flask import current_app
+from __future__ import with_statement
 
 import logging
 from logging.config import fileConfig

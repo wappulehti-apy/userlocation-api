@@ -21,12 +21,12 @@ logger.addHandler(handler)
 #     return compiler.visit_drop_table(element) + " CASCADE"
 
 
-if app.config['DEVELOP']:
-    with app.app_context():
-        logger.info("dropping database")
-        db.session.remove()
-        db.drop_all()
-        db.create_all()
+# if app.config['DEVELOP']:
+#     with app.app_context():
+#         logger.info("dropping database")
+#         db.session.remove()
+#         db.drop_all()
+#         db.create_all()
 
 logger.info("running migrations")
 with app.app_context():

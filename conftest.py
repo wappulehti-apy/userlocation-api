@@ -36,3 +36,17 @@ def database():
 def _db(database):
     """Required by pytest-flask-sqlalchemy"""
     return database
+
+
+@pytest.fixture(scope="function")
+def db_with_data(db_session):
+    from models import Location
+    location1 = Location(1, latitude=60.16952, longitude=24.93545, initials="A A")
+    location2 = Location(2, latitude=59.33258, longitude=18.0649, initials="B B")
+    db_session.add(location1)
+    db_session.add(location2)
+    db_session.commit()
+
+    yield
+
+    # Automatically rolled back by pytest-flask-sqlalchemy

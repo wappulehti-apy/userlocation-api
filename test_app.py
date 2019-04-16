@@ -1,6 +1,6 @@
 import os
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from base64 import b64encode
 from app import app as app
 from config import Testing as config
@@ -54,9 +54,43 @@ def test_response_is_json(client):
 def test_get_locations(client, db_session, db_with_data):
     r = client.get('/', headers=with_auth())
     assert r.get_json() == {'sellers': [
-        {'id': 'R3Ea3', 'initials': 'A A', 'location': {'lat': '60.16952000', 'lon': '24.93545000'}},
-        {'id': 'O6zkQ', 'initials': 'B B', 'location': {'lat': '59.33258000', 'lon': '18.06490000'}}
+        {'id': 'R3Ea3', 'initials': 'A A', 'location': {'lat': 60.16952, 'lon': 24.93545}},
+        {'id': 'O6zkQ', 'initials': 'B B', 'location': {'lat': 59.33258, 'lon': 18.0649}}
     ]}
+
+
+def test_callrequest_returns_success_true_on_success(client, db_session, db_with_data):
+    with patch('requests.post') as post:
+        post.return_value = MagicMock(status_code=200)
+        r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3'})
+    assert r.get_json() == {'success': True}
+
+
+def test_callrequest_returns_success_false_on_failed_request(client, db_session, db_with_data):
+    with patch('requests.post') as post:
+        post.return_value = MagicMock(status_code=500)
+        r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3'})
+    assert r.get_json() == {'success': False}
+
+
+def test_callrequest_returns_error_on_bad_id(client, db_session, db_with_data):
+    r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'nonexistent'})
+    assert r.get_json() == {'error': True, 'message': 'no user found'}
+    assert r.status == '404 NOT FOUND'
+
+
+def test_callrequest_returns_error_on_bad_phone(client, db_session, db_with_data):
+    r = client.post('/requestcall', json={'phoneNumber': 'invalid', 'sellerId': 'R3Ea3'})
+    assert r.get_json() == {'error': True, 'message': 'phoneNumber is not valid'}
+    assert r.status == '400 BAD REQUEST'
+
+
+def test_callrequest_calls_webhook_url(client, db_session, db_with_data):
+    with patch('requests.post') as post:
+        post.return_value = MagicMock(status_code=200)
+        r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3'})
+    args, kwargs = post.call_args
+    assert args[0] == "https://example.com/webhook"
 
 
 def test_set_location(client, db_session):
@@ -96,6 +130,6 @@ def test_empty_response(client):
 def test_response_schema(client, db_session, db_with_data):
     r = client.get('/', headers=with_auth())
     assert r.get_json() == {'sellers': [
-        {'id': 'R3Ea3', 'initials': 'A A', 'location': {'lat': '60.16952000', 'lon': '24.93545000'}},
-        {'id': 'O6zkQ', 'initials': 'B B', 'location': {'lat': '59.33258000', 'lon': '18.06490000'}}
+        {'id': 'R3Ea3', 'initials': 'A A', 'location': {'lat': 60.16952, 'lon': 24.93545}},
+        {'id': 'O6zkQ', 'initials': 'B B', 'location': {'lat': 59.33258, 'lon': 18.0649}}
     ]}

@@ -16,7 +16,9 @@ def create_app(redis_conn=None):
     app.url_map.strict_slashes = False
 
     from location import location
+    from callrequest import callrequest
     app.register_blueprint(location)
+    app.register_blueprint(callrequest)
 
     app.logger.info(f'APP_SETTINGS from {settings_class}')
     app.config.from_object(settings_class)

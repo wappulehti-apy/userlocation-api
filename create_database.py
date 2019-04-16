@@ -1,15 +1,18 @@
+import logging
+from sqlalchemy.exc import OperationalError
 from models import Location
-from app import app, db, migrate
+from app import create_app
+from database import db
 import os
 import sys
 from sqlalchemy import create_engine
 import config
 
+app = create_app(redis_conn=None)
+
 # from sqlalchemy.schema import DropTable
 # from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.exc import OperationalError
 
-import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler(sys.stdout)

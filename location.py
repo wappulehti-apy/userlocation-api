@@ -1,61 +1,26 @@
 import sys
 import os
-import logging
 import re
-from flask import Flask, jsonify, request
-from flask_sqlalchemy import SQLAlchemy
-from flask_basicauth import BasicAuth
+from gevent import sleep
+from datetime import datetime, timedelta
+from flask import current_app as app
+from flask import Blueprint, request, jsonify, session
 from sqlalchemy.exc import SQLAlchemyError
-from flask_basicauth import BasicAuth
-from flask_migrate import Migrate
 
-from database import db
-from cache import create_cache
-from location import LocationError
 from models import Location
 from webhook import Webhook
+from database import db
+
+location = Blueprint('location', __name__, url_prefix='/location')
+from app import basic_auth  # NOQA
 
 
-def create_app():
-    app = Flask(__name__)
-    app.logger.setLevel(logging.INFO)
-    settings_class = os.getenv('APP_SETTINGS', 'config.Config')
-    app.config.from_object(settings_class)
-    app.logger.info(f'Loaded APP_SETTINGS from {settings_class}')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.logger.info(f'Connecting to DB at {app.config["SQLALCHEMY_DATABASE_URI"]}')
-    db.init_app(app)
-    basic_auth = BasicAuth(app)
-    migrate = Migrate(app, db)
-
-    app.logger.setLevel(logging.DEBUG)
-
-    basic_auth = BasicAuth(app)
-    cache = create_cache(app)
-
-    return app, cache, db, migrate, basic_auth
-
-
-def get_location(cache):
-    location = cache.get('location')
-    if location is None:
-        raise LocationError('location not updated')
-    return location
-
-
-def isFloat(f):
-    try:
-        float(f)
-        return True
-    except BaseException as err:
-        return False
+class LocationError(Exception):
+    pass
 
 
 def validate_location(longitude, latitude):
     pass
-
-
-app, cache, db, migrate, basic_auth = create_app()
 
 
 def valid_phone(phone):
@@ -67,22 +32,10 @@ def valid_phone(phone):
     return True
 
 
-@app.route('/requestcall', methods=['POST'])
+@location.route('/requestcall', methods=['POST'])
 def requestcall():
     data = request.get_json()
     phone = data.get('phoneNumber')
-    public_id = data.get('sellerId')
-    buyer_id = '123'  # TODO
-
-    if phone is None or public_id is None:
-        return jsonify({'error': True, 'message': 'you must specify phoneNumber and sellerId'}), 400
-    if not valid_phone(phone):
-        return jsonify({'error': True, 'message': 'phoneNumber is not valid'}), 400
-
-    user = Location.query.filter_by(public_id=public_id).first()
-    if user is None:
-        return jsonify({'error': True, 'message': 'no user found'}), 404
-
     webhook = Webhook(app.config['WEBHOOK_URL'])
 
     app.logger.info('sending contact request')
@@ -92,7 +45,8 @@ def requestcall():
         return jsonify({'success': False})
 
 
-@app.route('/')
+
+@location.route('/')
 def get_locations():
     try:
         locations = Location.query.all()
@@ -103,7 +57,7 @@ def get_locations():
     return jsonify(response)
 
 
-@app.route('/set/<int:id>')
+@location.route('/set/<int:id>')
 @basic_auth.required
 def set_location(id):
     try:
@@ -128,7 +82,3 @@ def set_location(id):
 
     app.logger.info('location set (%s) to lon==%f, lat=%f', request.remote_addr, location.longitude, location.latitude)
     return jsonify({'success': True})
-
-
-if __name__ == '__main__':
-    app.run()

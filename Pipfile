@@ -22,6 +22,7 @@ psycopg2-binary = "*"
 flask-migrate = "*"
 hashids = "*"
 requests = "*"
+gevent = "*"
 
 [requires]
 python_version = "3.7"

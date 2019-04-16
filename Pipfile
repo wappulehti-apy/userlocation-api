@@ -23,6 +23,8 @@ flask-migrate = "*"
 hashids = "*"
 requests = "*"
 gevent = "*"
+fakeredis = "*"
+redis = "*"
 
 [requires]
 python_version = "3.7"

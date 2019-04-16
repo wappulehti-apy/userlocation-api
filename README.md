@@ -18,6 +18,7 @@ Sign upp for an heorku account, download the heroku CLI and log in.
 ```bash
 heroku create --region eu <myapp>
 heroku addons:create heroku-postgresql:hobby-dev
+heroku addons:create heroku-redis:hobby-dev
 ```
 
 ### Configuration

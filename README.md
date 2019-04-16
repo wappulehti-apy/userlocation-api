@@ -53,12 +53,12 @@ TODO
 
 Using GET requests:
 ```bash
-$ curl "localhost:5000/set/123?latitude=60.16952&longitude=30.00000&initials=H%20H%20S"
+$ curl "localhost:5000/location/set/123?latitude=60.16952&longitude=30.00000&initials=H%20H%20S"
 {
   "success": true
 }
 
-$ curl "localhost:5000/"
+$ curl "localhost:5000/location/"
 {
   "sellers": [
     {

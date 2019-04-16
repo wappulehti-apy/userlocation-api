@@ -1,25 +1,34 @@
 import pytest
-from app import app
+import fakeredis
+from app import create_app
 from database import db
 
 
-# @pytest.fixture
 @pytest.fixture(scope='session')
-def client(database):
+def redis_conn():
+    return fakeredis.FakeStrictRedis()
+
+
+@pytest.fixture(scope='session')
+def app(redis_conn):
+    _app = create_app(redis_conn=redis_conn)
+    yield _app
+
+
+@pytest.fixture(scope='session')
+def client(app):
     client = app.test_client()
 
     # Establish an application context before running the tests.
     ctx = app.app_context()
     ctx.push()
     yield client
-
     ctx.pop()
 
 
 @pytest.fixture(scope='session')
 def database():
-    with app.app_context():
-        db.create_all()
+    db.create_all()
     return db
 
 

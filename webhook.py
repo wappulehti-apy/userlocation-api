@@ -8,7 +8,7 @@ class Webhook:
     def __init__(self, webhook_url):
         self.webhook_url = webhook_url
 
-    def send_contact_request(self, user_id, contactdetails):
+    def send_contact_request(self, user_id, buyer_id, contactdetails):
         data = {
             "update_id": 999,
             "message": {
@@ -21,13 +21,13 @@ class Webhook:
                     "language_code": "en"
                 },
                 "chat": {
-                    "id": user_id,
+                    "id": 999,
                     "first_name": "System",
                     "username": "system",
                     "type": "private"
                 },
                 "date": 1555265276,
-                "text": "/contactrequest " + str(contactdetails),
+                "text": "/requestcall " + str(buyer_id) + " " + str(contactdetails),
                 "entities": [
                     {
                         "offset": 0,
@@ -39,6 +39,8 @@ class Webhook:
         }
         try:
             r = requests.post(self.webhook_url, json=data, timeout=2)
+            if r.status_code != 200:
+                return False
             return True
         except ConnectTimeout as err:
             logger.error(err)

@@ -1,6 +1,7 @@
 import sys
 import os
 import logging
+import re
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_basicauth import BasicAuth
@@ -57,11 +58,26 @@ def validate_location(longitude, latitude):
 app, cache, db, migrate, basic_auth = create_app()
 
 
-@app.route('/contactrequest/<string:public_id>')
-def contactrequest(public_id):
-    if 'phone' not in request.args:
-        return jsonify({'error': True, 'message': 'you must specify phone-parameter'}), 400
-    phone = request.args.get('phone')
+def valid_phone(phone):
+    if len(phone) < 6 or len(phone) > 15:
+        return False
+    # Must contain at least 3 numbers
+    if not re.search(r"\d\d\d", phone):
+        return False
+    return True
+
+
+@app.route('/requestcall', methods=['POST'])
+def requestcall():
+    data = request.get_json()
+    phone = data.get('phoneNumber')
+    public_id = data.get('sellerId')
+    buyer_id = '123'  # TODO
+
+    if phone is None or public_id is None:
+        return jsonify({'error': True, 'message': 'you must specify phoneNumber and sellerId'}), 400
+    if not valid_phone(phone):
+        return jsonify({'error': True, 'message': 'phoneNumber is not valid'}), 400
 
     user = Location.query.filter_by(public_id=public_id).first()
     if user is None:
@@ -70,7 +86,7 @@ def contactrequest(public_id):
     webhook = Webhook(app.config['WEBHOOK_URL'])
 
     app.logger.info('sending contact request')
-    if webhook.send_contact_request(user.id, phone):
+    if webhook.send_contact_request(user.id, buyer_id, phone):
         return jsonify({'success': True})
     else:
         return jsonify({'success': False})

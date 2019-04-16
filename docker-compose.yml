@@ -21,3 +21,8 @@ services:
      - "127.0.0.1:9000:5432"
     environment:
      - "POSTGRES_PASSWORD="
+  redis:
+    image: "redis:alpine"
+    expose:
+     - "6379"
+    command: ["redis-server", "--loglevel", "warning"]

@@ -13,12 +13,15 @@ class Config(object):
     BASIC_AUTH_PASSWORD = os.getenv("BASIC_AUTH_PASSWORD")
     GEO_NAME = os.getenv("GEO_NAME") or 'default'
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     WEBHOOK_URL = os.getenv('WEBHOOK_URL')
+    REDIS_URL = os.getenv("REDIS_URL")
 
 
 class Develop(Config):
     load_dotenv(verbose=True)
     SQLALCHEMY_DATABASE_URI = "postgres://postgres:@postgres/postgres"
+    REDIS_URL = "redis://redis"
     DEVELOP = True
 
 

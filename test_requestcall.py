@@ -19,14 +19,14 @@ def with_auth(original={}):
 def test_requestcall_returns_success_true_on_success(client, db_session, db_with_data, redis_conn):
     with patch('requests.post', return_value=MagicMock(status_code=200)) as post,\
             patch.object(redis_conn, 'get', return_value='accepted'):
-        r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3', 'sessionId': '123'})
+        r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3'}, headers={'sessionId': '123'})
     assert r.get_json() == {'success': True}
 
 
 def test_requestcall_returns_error_on_failed_request(client, db_session, db_with_data):
     with patch('requests.post') as post:
         post.return_value = MagicMock(status_code=500)
-        r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3', 'sessionId': '123'})
+        r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3'}, headers={'sessionId': '123'})
     assert r.get_json() == {'error': True, 'success': False}
 
 
@@ -38,7 +38,7 @@ def test_requestcall_reads_session_from_session_id(client, db_session, db_with_d
 
     with patch('requests.post') as post:
         post.return_value = MagicMock(status_code=200)
-        r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3', 'sessionId': '100'})
+        r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3'}, headers={'sessionId': '100'})
     assert r.get_json() == {'success': True}
 
 
@@ -47,7 +47,7 @@ def test_requestcall_returns_success_false_on_decline(client, db_session, db_wit
 
     with patch('requests.post') as post:
         post.return_value = MagicMock(status_code=200)
-        r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3', 'sessionId': '123'})
+        r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3'}, headers={'sessionId': '123'})
     assert r.get_json() == {'success': False}
 
 
@@ -59,7 +59,7 @@ def test_requestcall_returns_error_on_bad_id(client, db_session, db_with_data):
 
 def test_requestcall_returns_error_on_bad_phone(client, db_session, db_with_data, redis_conn):
     redis_conn.set(f'response:123', 'accepted')
-    r = client.post('/requestcall', json={'phoneNumber': 'invalid', 'sellerId': 'R3Ea3', 'sessionId': '123'})
+    r = client.post('/requestcall', json={'phoneNumber': 'invalid', 'sellerId': 'R3Ea3'}, headers={'sessionId': '123'})
     assert r.get_json() == {'error': True, 'message': 'phoneNumber is not valid'}
     assert r.status == '400 BAD REQUEST'
 
@@ -68,7 +68,7 @@ def test_requestcall_calls_webhook_url(client, db_session, db_with_data, redis_c
     redis_conn.set(f'response:123', 'accepted')
     with patch('requests.post', return_value=MagicMock(status_code=200)) as post,\
             patch.object(redis_conn, 'get', return_value='accepted'):
-        r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3', 'sessionId': '123'})
+        r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3'}, headers={'sessionId': '123'})
     args, kwargs = post.call_args
     assert args[0] == "https://example.com/webhook"
 
@@ -79,7 +79,8 @@ def test_respond_requestcall_requires_auth(client, db_session, db_with_data):
 
 
 def test_respond_requestcall_returns_error_on_bad_repsonse(client, db_session, db_with_data):
-    r = client.post('/requestcall/respond', json={'buyerId': '123asd', 'response': 'nonexistent'}, headers=with_auth())
+    headers = {**with_auth(), 'sessionId': '123'}
+    r = client.post('/requestcall/respond', json={'buyerId': '123asd', 'response': 'nonexistent'}, headers=headers)
     assert r.status == '400 BAD REQUEST'
 
 # def test_respond_requestcall_sets_response_in_redis(client, db_session, db_with_data, redis_conn):

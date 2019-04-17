@@ -42,7 +42,7 @@ def post_requestcall():
     data = request.get_json()
     phone = data.get('phoneNumber')
     public_id = data.get('sellerId')
-    buyer_id = data.get('sessionId')
+    buyer_id = request.headers.get('sessionId')
 
     app.logger.info(data)
     if phone is None or public_id is None:

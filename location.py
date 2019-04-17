@@ -23,8 +23,18 @@ def validate_location(longitude, latitude):
 def get_locations():
     app.logger.info('location query from %s', request.remote_addr)
     try:
+        # Fetch sellers
         locations = Location.query.all()
         response = {'sellers': [l.to_simple_json() for l in locations]}
+        # Fetch requestcall
+        buyer_id = request.headers.get('sessionId')
+        if buyer_id:
+            requestcall_status = app.redis.get(f'response:{buyer_id}')
+            if requestcall_status:
+                response = {**response, 'callRequest': {
+                    'sellerId': 'DUMMY',
+                    'accepted': response
+                }}
 
     except LocationError as err:
         response = {'error': True, 'message': str(err)}

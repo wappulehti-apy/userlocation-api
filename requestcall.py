@@ -33,6 +33,7 @@ def post_respond():
         return jsonify({'error': True, 'message': 'unknown response'}), 400
     app.logger.info(f'response for buyer {buyer_id}: {response}')
     app.redis.set(f'response:{buyer_id}', response)
+    # TODO timed out
     return '', 200
 
 
@@ -67,9 +68,11 @@ def post_requestcall():
             app.logger.info('requestcall no response')
             return jsonify({'success': False})
         if response == 'accepted':
+            app.redis.delete(f'response:{buyer_id}')
             app.logger.info('requestcall accepted')
             return jsonify({'success': True})
         elif response == 'declined':
+            app.redis.delete(f'response:{buyer_id}')
             app.logger.info('requestcall delcined')
             return jsonify({'success': False})
         sleep(1)

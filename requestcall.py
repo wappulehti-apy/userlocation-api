@@ -29,6 +29,7 @@ def post_requestcall():
     public_id = data.get('sellerId')
     buyer_id = data.get('sessionId')
 
+    app.logger.info(data)
     if phone is None or public_id is None:
         return jsonify({'error': True, 'message': 'you must specify phoneNumber and sellerId'}), 400
     if not valid_phone(phone):
@@ -43,7 +44,7 @@ def post_requestcall():
     app.logger.info(f'sending requestcall for buyer {buyer_id}')
     if not webhook.send_contact_request(user.id, buyer_id, phone):
         app.logger.info('requestcall failed')
-        return jsonify({'success': False, 'error': True})
+        return jsonify({'success': False, 'error': True}), 500
     end_time = datetime.now() + timedelta(seconds=60)
     while True:
         app.logger.info('waiting')

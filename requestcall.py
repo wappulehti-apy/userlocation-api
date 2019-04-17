@@ -28,7 +28,11 @@ def post_respond():
     data = request.get_json()
     buyer_id = data.get('buyerId')
     response = data.get('response')
+    if response not in ['accepted', 'declined']:
+        app.logger.info(f'unknown response: {response}')
+        return jsonify({'error': True, 'message': 'unknown response'}), 400
     app.logger.info(f'response for buyer {buyer_id}: {response}')
+    app.redis.set(f'response: {buyer_id}: {response}')
     return '', 200
 
 

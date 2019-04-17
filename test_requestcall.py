@@ -71,3 +71,20 @@ def test_requestcall_calls_webhook_url(client, db_session, db_with_data, redis_c
         r = client.post('/requestcall', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3', 'sessionId': '123'})
     args, kwargs = post.call_args
     assert args[0] == "https://example.com/webhook"
+
+
+def test_respond_requestcall_requires_auth(client, db_session, db_with_data):
+    r = client.post('/requestcall/respond', json={'buyerId': '123asd', 'response': 'nonexistent'})
+    assert r.status == '401 UNAUTHORIZED'
+
+
+def test_respond_requestcall_returns_error_on_bad_repsonse(client, db_session, db_with_data):
+    r = client.post('/requestcall/respond', json={'buyerId': '123asd', 'response': 'nonexistent'}, headers=with_auth())
+    assert r.status == '400 BAD REQUEST'
+
+# def test_respond_requestcall_sets_response_in_redis(client, db_session, db_with_data, redis_conn):
+#     with patch('requests.post', return_value=MagicMock(status_code=200)) as post,\
+#             patch.object(redis_conn, 'set', return_value=None) as redis_set:
+#         r = client.post('/requestcall/respond', json={'buyerId': '123asd', 'response': 'accepted'}, headers=with_auth())
+#     assert redis_set.assert_called()
+#     assert r.status == '200 OK'

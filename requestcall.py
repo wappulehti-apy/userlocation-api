@@ -32,7 +32,7 @@ def post_respond():
         app.logger.info(f'unknown response: {response}')
         return jsonify({'error': True, 'message': 'unknown response'}), 400
     app.logger.info(f'response for buyer {buyer_id}: {response}')
-    app.redis.set(f'response: {buyer_id}: {response}')
+    app.redis.set(f'response: {buyer_id}', response)
     return '', 200
 
 

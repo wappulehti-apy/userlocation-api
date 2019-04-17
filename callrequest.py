@@ -9,7 +9,7 @@ from models import Location
 from webhook import Webhook
 from database import db
 
-callrequest = Blueprint('callrequest', __name__, url_prefix='/callrequest')
+requestcall = Blueprint('requestcall', __name__, url_prefix='/requestcall')
 from app import basic_auth  # NOQA
 
 
@@ -22,8 +22,8 @@ def valid_phone(phone):
     return True
 
 
-@callrequest.route('/', methods=['POST'])
-def post_callrequest():
+@requestcall.route('/', methods=['POST'])
+def post_requestcall():
     data = request.get_json()
     phone = data.get('phoneNumber')
     public_id = data.get('sellerId')
@@ -40,21 +40,21 @@ def post_callrequest():
 
     webhook = Webhook(app.config['WEBHOOK_URL'])
 
-    app.logger.info(f'sending callrequest for buyer {buyer_id}')
+    app.logger.info(f'sending requestcall for buyer {buyer_id}')
     if not webhook.send_contact_request(user.id, buyer_id, phone):
-        app.logger.info('callrequest failed')
+        app.logger.info('requestcall failed')
         return jsonify({'success': False, 'error': True})
     end_time = datetime.now() + timedelta(seconds=60)
     while True:
         app.logger.info('waiting')
         response = app.redis.get(f'response:{buyer_id}')
         if datetime.now() >= end_time:
-            app.logger.info('callrequest no response')
+            app.logger.info('requestcall no response')
             return jsonify({'success': False})
         if response == 'accepted':
-            app.logger.info('callrequest accepted')
+            app.logger.info('requestcall accepted')
             return jsonify({'success': True})
         elif response == 'declined':
-            app.logger.info('callrequest delcined')
+            app.logger.info('requestcall delcined')
             return jsonify({'success': False})
         sleep(1)

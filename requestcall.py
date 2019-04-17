@@ -22,6 +22,16 @@ def valid_phone(phone):
     return True
 
 
+@requestcall.route('/respond', methods=['POST'])
+@basic_auth.required
+def post_respond():
+    data = request.get_json()
+    buyer_id = data.get('buyerId')
+    response = data.get('response')
+    app.logger.info(f'response for buyer {buyer_id}: {response}')
+    return '', 200
+
+
 @requestcall.route('/', methods=['POST'])
 def post_requestcall():
     data = request.get_json()

@@ -32,7 +32,7 @@ def create_app(redis_conn=None):
 
     if redis_conn is None:
         import redis
-        app.redis = redis.from_url(app.config["REDIS_URL"])
+        app.redis = redis.from_url(app.config["REDIS_URL"], decode_responses=True)
     else:
         app.redis = redis_conn
 

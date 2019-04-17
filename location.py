@@ -33,7 +33,7 @@ def get_locations():
             if requestcall_status:
                 response = {**response, 'callRequest': {
                     'sellerId': 'DUMMY',
-                    'accepted': response
+                    'accepted': True
                 }}
 
     except LocationError as err:

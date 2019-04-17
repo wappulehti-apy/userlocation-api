@@ -29,7 +29,7 @@ def get_locations():
         # Fetch requestcall
         buyer_id = request.headers.get('sessionId')
         if buyer_id:
-            requestcall_status = app.redis.get(f'response:{buyer_id}')
+            response = app.redis.get(f'response:{buyer_id}')
             if requestcall_status:
                 response = {**response, 'callRequest': {
                     'sellerId': 'DUMMY',

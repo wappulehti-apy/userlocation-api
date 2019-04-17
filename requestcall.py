@@ -60,19 +60,20 @@ def post_requestcall():
     if not webhook.send_contact_request(user.id, buyer_id, phone):
         app.logger.info('requestcall failed')
         return jsonify({'success': False, 'error': True}), 500
-    end_time = datetime.now() + timedelta(seconds=60)
-    while True:
-        app.logger.info('waiting')
-        response = app.redis.get(f'response:{buyer_id}')
-        if datetime.now() >= end_time:
-            app.logger.info('requestcall no response')
-            return jsonify({'success': False})
-        if response == 'accepted':
-            app.redis.delete(f'response:{buyer_id}')
-            app.logger.info('requestcall accepted')
-            return jsonify({'success': True})
-        elif response == 'declined':
-            app.redis.delete(f'response:{buyer_id}')
-            app.logger.info('requestcall delcined')
-            return jsonify({'success': False})
-        sleep(1)
+    return jsonify({'success': True})
+    # end_time = datetime.now() + timedelta(seconds=60)
+    # while True:
+    #     app.logger.info('waiting')
+    #     response = app.redis.get(f'response:{buyer_id}')
+    #     if datetime.now() >= end_time:
+    #         app.logger.info('requestcall no response')
+    #         return jsonify({'success': False})
+    #     if response == 'accepted':
+    #         app.redis.delete(f'response:{buyer_id}')
+    #         app.logger.info('requestcall accepted')
+    #         return jsonify({'success': True})
+    #     elif response == 'declined':
+    #         app.redis.delete(f'response:{buyer_id}')
+    #         app.logger.info('requestcall delcined')
+    #         return jsonify({'success': False})
+    #     sleep(1)

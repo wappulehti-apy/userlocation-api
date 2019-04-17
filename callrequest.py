@@ -27,9 +27,7 @@ def post_callrequest():
     data = request.get_json()
     phone = data.get('phoneNumber')
     public_id = data.get('sellerId')
-    if 'id' not in session:
-        session['id'] = uuid.uuid4()
-    buyer_id = session['id']
+    buyer_id = data.get('sessionId')
 
     if phone is None or public_id is None:
         return jsonify({'error': True, 'message': 'you must specify phoneNumber and sellerId'}), 400

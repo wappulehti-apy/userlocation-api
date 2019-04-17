@@ -1,5 +1,6 @@
 import re
 from gevent import sleep
+import uuid
 from datetime import datetime, timedelta
 from flask import current_app as app
 from flask import Blueprint, request, jsonify, session
@@ -26,7 +27,9 @@ def post_callrequest():
     data = request.get_json()
     phone = data.get('phoneNumber')
     public_id = data.get('sellerId')
-    buyer_id = '123'  # TODO
+    if 'id' not in session:
+        session['id'] = uuid.uuid4()
+    buyer_id = session['id']
 
     if phone is None or public_id is None:
         return jsonify({'error': True, 'message': 'you must specify phoneNumber and sellerId'}), 400
@@ -39,15 +42,21 @@ def post_callrequest():
 
     webhook = Webhook(app.config['WEBHOOK_URL'])
 
-    app.logger.info('sending contact request')
+    app.logger.info(f'sending callrequest for buyer {buyer_id}')
     if not webhook.send_contact_request(user.id, buyer_id, phone):
-        app.logger.info('contact request failed')
-        return jsonify({'success': False})
+        app.logger.info('callrequest failed')
+        return jsonify({'success': False, 'error': True})
     end_time = datetime.now() + timedelta(seconds=60)
     while True:
+        app.logger.info('waiting')
         response = app.redis.get(f'response:{buyer_id}')
         if datetime.now() >= end_time:
+            app.logger.info('callrequest no response')
             return jsonify({'success': False})
-        if response is not None:
+        if response == 'accepted':
+            app.logger.info('callrequest accepted')
             return jsonify({'success': True})
+        elif response == 'declined':
+            app.logger.info('callrequest delcined')
+            return jsonify({'success': False})
         sleep(1)

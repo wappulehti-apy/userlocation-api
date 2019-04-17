@@ -39,6 +39,7 @@ class Webhook:
         }
         try:
             r = requests.post(self.webhook_url, json=data, timeout=2)
+            logger.info(f'webhook returned {r.status_code}')
             if r.status_code != 200:
                 return False
             return True

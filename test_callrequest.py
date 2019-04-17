@@ -23,9 +23,33 @@ def test_callrequest_returns_success_true_on_success(client, db_session, db_with
     assert r.get_json() == {'success': True}
 
 
-def test_callrequest_returns_success_false_on_failed_request(client, db_session, db_with_data):
+def test_callrequest_returns_error_on_failed_request(client, db_session, db_with_data):
     with patch('requests.post') as post:
         post.return_value = MagicMock(status_code=500)
+        r = client.post('/callrequest', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3'})
+    assert r.get_json() == {'error': True, 'success': False}
+
+
+def test_callrequest_reads_session_for_buyer_id(client, db_session, db_with_data, redis_conn):
+    redis_conn.set(f'response:100', 'accepted')
+
+    with client.session_transaction() as sess:
+        sess['id'] = '100'
+
+    with patch('requests.post') as post:
+        post.return_value = MagicMock(status_code=200)
+        r = client.post('/callrequest', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3'})
+    assert r.get_json() == {'success': True}
+
+
+def test_callrequest_returns_success_false_on_decline(client, db_session, db_with_data, redis_conn):
+    redis_conn.set(f'response:123', 'declined')
+
+    with client.session_transaction() as sess:
+        sess['id'] = '123'
+
+    with patch('requests.post') as post:
+        post.return_value = MagicMock(status_code=200)
         r = client.post('/callrequest', json={'phoneNumber': '040 123456', 'sellerId': 'R3Ea3'})
     assert r.get_json() == {'success': False}
 

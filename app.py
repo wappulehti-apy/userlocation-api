@@ -4,10 +4,11 @@ from flask import Flask
 from flask_basicauth import BasicAuth
 from flask_migrate import Migrate
 import logging
-
+from redismap import RedisMap
 
 migrate = Migrate()
 basic_auth = BasicAuth()
+redis_map = RedisMap()
 
 
 def create_app(redis_conn=None):
@@ -35,5 +36,6 @@ def create_app(redis_conn=None):
         app.redis = redis.from_url(app.config["REDIS_URL"], decode_responses=True)
     else:
         app.redis = redis_conn
+    redis_map.init_app(app, app.redis)
 
     return app

@@ -9,34 +9,11 @@ hashids = Hashids(salt=os.getenv("SALT", "default"), min_length=5)
 #     return hashids.encode(id)
 
 
-class SQLite3(object):
-
-    def init_app(self, app):
-        app.config.setdefault('SQLITE3_DATABASE', ':memory:')
-        app.teardown_appcontext(self.teardown)
-
-    def connect(self):
-        return sqlite3.connect(current_app.config['SQLITE3_DATABASE'])
-
-    def teardown(self, exception):
-        ctx = _app_ctx_stack.top
-        if hasattr(ctx, 'sqlite3_db'):
-            ctx.sqlite3_db.close()
-
-    @property
-    def connection(self):
-        ctx = _app_ctx_stack.top
-        if ctx is not None:
-            if not hasattr(ctx, 'sqlite3_db'):
-                ctx.sqlite3_db = self.connect()
-            return ctx.sqlite3_db
-
-
 class RedisMap():
     def __init__(self, app=None, redis_conn=None):
         self.locationkey = 'loc'
         self.userkey = 'user'
-        if app is not None:
+        if app is not None or redis_conn is not None:
             self.init_app(app, redis_conn)
 
     def init_app(self, app, redis_conn):
@@ -58,17 +35,26 @@ class RedisMap():
             # r.delete(key)
             # pass
 
+    @staticmethod
+    def to_json(location):
+        return {
+            'id': location[0],
+            'longitude': location[1][0],
+            'latitude': location[1][1]
+        }
+
     def get_locations(self, longitude, latitude, radius=10):
-        users = self.r.georadius('loc', longitude, latitude, radius, unit='km', withdist=True, withcoord=True)
-        # code to public id's
+        users = self.r.georadius(self.locationkey, longitude, latitude, radius, unit='km', withcoord=True)
         return users
 
-    def add_or_update_user(self, id, public_id=None):
+    def add_or_update_user(self, id, initials=None, public_id=None):
         expire_seconds = 60 * 5
         public_id = public_id or self._get_public_id(id)
-        self.r.setex(f'user:{id}', expire_seconds, public_id)
+        self.r.setex(f'user:{public_id}', expire_seconds, str(id))
+        # TODO exception handling
 
-    def update_user_location(self, id, longitude, latitude):
+    def update_user_location(self, id, longitude, latitude, initials):
         public_id = self._get_public_id(id)
-        self.r.geoadd(self.locationkey, longitude, latitude, str(id))
-        self.add_or_update_user(id, public_id=public_id)
+        self.r.geoadd(self.locationkey, longitude, latitude, public_id)
+        self.add_or_update_user(id, initials=initials, public_id=public_id)
+        # TODO exception handling

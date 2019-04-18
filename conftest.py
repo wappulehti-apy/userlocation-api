@@ -6,7 +6,7 @@ from database import db
 
 @pytest.fixture(scope='session')
 def redis_conn():
-    return fakeredis.FakeStrictRedis(decode_responses=True)
+    return fakeredis.FakeRedis(decode_responses=True)
 
 
 @pytest.fixture(scope='session')

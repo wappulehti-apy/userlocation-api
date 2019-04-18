@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from flask import current_app as app
 from flask import Blueprint, request, jsonify, session
 
-from models import Location
+from models import Location, generate_public_id
 from webhook import Webhook
 from database import db
 
@@ -28,11 +28,22 @@ def post_respond():
     data = request.get_json()
     buyer_id = data.get('buyerId')
     response = data.get('response')
+    try:
+        user_id = int(data.get('userId'))
+    except TypeError:
+        return jsonify({'error': True, 'message': 'userId is not numeric'}), 400
+
     if response not in ['accepted', 'declined']:
         app.logger.info(f'unknown response: {response}')
         return jsonify({'error': True, 'message': 'unknown response'}), 400
+    if user_id is None:
+        app.logger.info(f'user_id missing')
+        return jsonify({'error': True, 'message': 'user_id missing'}), 400
+
+    seller_id = generate_public_id(user_id)
+    requestcall_response = {'response': response, 'seller_id': seller_id}
     app.logger.info(f'response for buyer {buyer_id}: {response}')
-    app.redis.set(f'response:{buyer_id}', response)
+    app.redis.hmset(f'response:{buyer_id}', requestcall_response)
     # TODO timed out
     return '', 200
 

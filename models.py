@@ -10,6 +10,10 @@ from database import db
 hashids = Hashids(salt=os.getenv("SALT", "default"), min_length=5)
 
 
+def generate_public_id(id):
+    return hashids.encode(id)
+
+
 class Location(db.Model):
     __tablename__ = 'locations'
 
@@ -22,7 +26,7 @@ class Location(db.Model):
 
     def __init__(self, id, latitude, longitude, initials):
         self.id = id
-        self.public_id = hashids.encode(id)
+        self.public_id = generate_public_id(id)
         self.latitude = latitude
         self.longitude = longitude
         self.initials = initials

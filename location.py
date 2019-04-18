@@ -3,7 +3,7 @@ from flask import current_app as app
 from flask import Blueprint, request, jsonify, session
 from sqlalchemy.exc import SQLAlchemyError
 
-from models import Location
+from models import Location, generate_public_id
 from webhook import Webhook
 from database import db
 
@@ -29,11 +29,15 @@ def get_locations():
         # Fetch requestcall
         buyer_id = request.headers.get('sessionId')
         if buyer_id:
-            requestcall_status = app.redis.get(f'response:{buyer_id}')
+            app.logger.info(f'buyer {buyer_id}')
+            requestcall_status = app.redis.hgetall(f'response:{buyer_id}')
+            app.logger.info(requestcall_status)
             if requestcall_status:
+                app.redis.hdel(f'response:{buyer_id}', 'response', 'seller_id')
+                seller_id = generate_public_id(int(requestcall_status['user_id']))
                 response = {**response, 'callRequest': {
-                    'sellerId': 'DUMMY',
-                    'accepted': True
+                    'sellerId': seller_id,
+                    'accepted': requestcall_status['response'] == 'accepted'
                 }}
 
     except LocationError as err:

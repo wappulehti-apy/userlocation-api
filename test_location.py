@@ -40,6 +40,18 @@ def test_get_locations(client, db_session, db_with_data):
     ]}
 
 
+def test_get_locations_returns_callrequest_if_set(client, db_session, db_with_data, redis_conn):
+    redis_conn.hmset(f'response:123', {'response': 'accepted', 'user_id': '999'})
+    headers = {**with_auth(), 'sessionId': '123'}
+    r = client.get('/location/', headers=headers)
+    assert r.get_json() == {'sellers': [
+        {'id': 'R3Ea3', 'initials': 'A A', 'location': {'lat': 60.16952, 'lon': 24.93545}},
+        {'id': 'O6zkQ', 'initials': 'B B', 'location': {'lat': 59.33258, 'lon': 18.0649}}
+    ],
+        'callRequest': {'accepted': True, 'sellerId': 'Q2k23'}
+    }
+
+
 def test_set_location(client, db_session):
     user_id = 123
     r = client.get(f'/location/set/{user_id}?latitude=60.16952&longitude=24.93545&initials=B%20A', headers=with_auth())

@@ -51,6 +51,9 @@ class RedisMap():
     def to_json(location):
         return {
             'id': location[0],
-            'lon': location[1][0],
-            'lat': location[1][1]
+            'initials': 'A A',
+            'location':{
+                'lon': location[1][0],
+                'lat': location[1][1]
+            }
         }

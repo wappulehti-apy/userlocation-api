@@ -4,11 +4,12 @@ from flask import Blueprint, request, jsonify, session
 from sqlalchemy.exc import SQLAlchemyError
 
 from models import Location, generate_public_id
+from redismap import RedisMap
 from webhook import Webhook
 from database import db
 
 location = Blueprint('location', __name__, url_prefix='/location')
-from app import basic_auth  # NOQA
+from app import basic_auth, redis_map  # NOQA
 
 
 class LocationError(Exception):
@@ -24,8 +25,8 @@ def get_locations():
     app.logger.info('location query from %s', request.remote_addr)
     try:
         # Fetch sellers
-        locations = Location.query.all()
-        response = {'sellers': [l.to_simple_json() for l in locations]}
+        locations = redis_map.get_locations(24.0, 60.0, 1000)
+        response = {'sellers': [redis_map.to_json(l) for l in locations]}
         # Fetch requestcall
         buyer_id = request.headers.get('sessionId')
         if buyer_id:
@@ -55,21 +56,11 @@ def set_location(id):
         initials = str(request.args.get('initials'))
         validate_location(longitude, latitude)
 
-        location = Location(id, latitude=latitude, longitude=longitude, initials=initials)
-        # Perform upsert with merge()
-        db.session.merge(location)
-        db.session.commit()
-    except SQLAlchemyError as err:
-        app.logger.error('sqlalchemy error from %s: %s', request.remote_addr, err)
-        error_detail = type(err.__dict__['orig']).__name__
-        return jsonify({'error': True, 'message': 'cannot insert to database', 'detail': error_detail}), 500
-
-    except (ValueError, KeyError, TypeError) as err:
-        app.logger.error('invalid location set from %s: %s', request.remote_addr, err)
-        return jsonify({'error': True, 'message': 'invalid location', 'detail': str(err)}), 400
+        redis_map.update_user_location(id, longitude, latitude, initials)
+        # TODO exception handling
 
     except BaseException as err:
         return jsonify({'error': True, 'message': 'unknown error', 'detail': str(err)}), 500
 
-    app.logger.info('location set (%s) to lon==%f, lat=%f', request.remote_addr, location.longitude, location.latitude)
+    app.logger.info('location set (%s) to lon==%f, lat=%f', request.remote_addr, longitude, latitude)
     return jsonify({'success': True})

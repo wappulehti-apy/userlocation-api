@@ -34,7 +34,7 @@ def get_locations():
             app.logger.info(requestcall_status)
             if requestcall_status:
                 app.redis.hdel(f'response:{buyer_id}', 'response', 'seller_id')
-                seller_id = generate_public_id(int(requestcall_status['user_id']))
+                seller_id = requestcall_status['seller_id']
                 response = {**response, 'callRequest': {
                     'sellerId': seller_id,
                     'accepted': requestcall_status['response'] == 'accepted'

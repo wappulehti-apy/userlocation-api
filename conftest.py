@@ -1,12 +1,28 @@
 import pytest
-import fakeredis
+from unittest.mock import patch, MagicMock
+from fakeredis import FakeRedis
 from app import create_app
-from database import db
+from redismap import RedisMap
 
 
 @pytest.fixture(scope='session')
 def redis_conn():
-    return fakeredis.FakeRedis(decode_responses=True)
+    class AugmentedFakeredis(FakeRedis):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.data = {}
+
+        def geoadd(self, key, longitude, latitude, value):
+            assert isinstance(key, str)
+            assert isinstance(value, str)
+            insert_tuple = (value, [longitude, latitude])
+            self.data.setdefault(key, []).append(insert_tuple)
+
+        def georadius(self, key, longitude, latitude, radius, **kwargs):
+            assert isinstance(key, str)
+            return self.data.get(key, [])
+
+    return AugmentedFakeredis(decode_responses=True)
 
 
 @pytest.fixture(scope='session')
@@ -26,27 +42,24 @@ def client(app):
     ctx.pop()
 
 
-@pytest.fixture(scope='session')
-def database():
-    db.create_all()
-    return db
-
-
-@pytest.fixture(scope='session')
-def _db(database):
-    """Required by pytest-flask-sqlalchemy"""
-    return database
-
-
 @pytest.fixture(scope="function")
-def db_with_data(db_session):
-    from models import Location
-    location1 = Location(1, latitude=60.16952, longitude=24.93545, initials="A A")
-    location2 = Location(2, latitude=59.33258, longitude=18.0649, initials="B B")
-    db_session.add(location1)
-    db_session.add(location2)
-    db_session.commit()
+def map_with_data(redis_map, redis_conn):
+    redis_conn.data = {'loc': [
+        ('R3Ea3', [24.93545, 60.16952]),
+        ('O6zkQ', [18.0649, 59.33258])
+    ]}
 
-    yield
 
-    # Automatically rolled back by pytest-flask-sqlalchemy
+@pytest.fixture(scope='function')
+def redis_mock(redis_conn):
+    return MagicMock()
+
+
+@pytest.fixture(scope='function')
+def redis_map(redis_conn):
+    yield RedisMap(MagicMock(), redis_conn)
+
+
+@pytest.fixture(scope='function')
+def redis_map_mock(redis_mock):
+    yield RedisMap(MagicMock(), redis_mock)

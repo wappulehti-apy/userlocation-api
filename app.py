@@ -26,6 +26,7 @@ def create_app(redis_conn=None):
     app.logger.info(f'APP_SETTINGS from {settings_class}')
     app.config.from_object(settings_class)
     CORS(app, origins=app.config['CORS_ORIGINS'])
+    logging.getLogger('flask_cors').level = logging.DEBUG
 
     from database import db
     db.init_app(app)

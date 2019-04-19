@@ -1,9 +1,6 @@
 from datetime import datetime, timedelta
 from flask import current_app as app
 from flask import Blueprint, request, jsonify, session
-from sqlalchemy.exc import SQLAlchemyError
-
-from models import Location, generate_public_id
 from redismap import RedisMap
 from webhook import Webhook
 from database import db

@@ -5,7 +5,6 @@ from flask import current_app as app
 
 class Webhook:
     def __init__(self, webhook_url):
-        app.logger.info(f'webhook initialized with {webhook_url}')
         self.webhook_url = webhook_url
 
     def send_contact_request(self, user_id, buyer_id, contactdetails):

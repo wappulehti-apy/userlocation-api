@@ -34,6 +34,7 @@ class Develop(Config):
 
 
 class Testing(Config):
+    DEBUG = True
     TESTING = True
     SECRET_KEY = "mysecretley"
     SQLALCHEMY_DATABASE_URI = "sqlite://"

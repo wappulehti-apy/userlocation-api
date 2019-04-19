@@ -3,6 +3,7 @@ import os
 from flask import Flask
 from flask_basicauth import BasicAuth
 from flask_migrate import Migrate
+from flask_cors import CORS
 import logging
 from redismap import RedisMap
 
@@ -14,6 +15,7 @@ redis_map = RedisMap()
 def create_app(redis_conn=None):
     settings_class = os.getenv('APP_SETTINGS', 'config.Config')
     app = Flask(__name__)
+    CORS(app)
     app.url_map.strict_slashes = False
 
     from location import location

@@ -17,7 +17,6 @@ Sign upp for an heorku account, download the heroku CLI and log in.
 
 ```bash
 heroku create --region eu <myapp>
-heroku addons:create heroku-postgresql:hobby-dev
 heroku addons:create heroku-redis:hobby-dev
 ```
 
@@ -84,11 +83,6 @@ Test using pytest
 ```bash
 pipenv run pytest
 ```
-
-## FAQ
-
-How do I connec to the local database running in docker?
-`psql -h localhost -p 9000 -U postgres postgres`
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

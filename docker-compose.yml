@@ -8,19 +8,9 @@ services:
      - .:/app
     environment:
      - "APP_SETTINGS=config.Develop"
-    depends_on:
-      - postgres
     ports:
      - "127.0.0.1:5000:5000"
     #command: bash -c "flask run"
-  postgres:
-    image: "postgres:11-alpine"
-    expose:
-     - "5432"
-    ports:
-     - "127.0.0.1:9000:5432"
-    environment:
-     - "POSTGRES_PASSWORD="
   redis:
     image: "redis:alpine"
     expose:

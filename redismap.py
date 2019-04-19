@@ -25,7 +25,6 @@ class RedisMap():
 
     def user_id(self, public_id):
         try:
-            # return self.r.get(f'{self.userkey}:{public_id}')
             return int(self.r.get(f'{self.userkey}:{public_id}'))
         except (ValueError, TypeError):
             return None

@@ -72,3 +72,11 @@ def test_get_locations_named_returns_named_tuple(redis_mock, redis_map_mock):
     assert locations == [
         Location('R3Ea3', 24.0, 60.0, 'A A')
     ]
+
+
+def test_user_exists(redis_map, redis_conn, map_with_data):
+    #exists = side_eddects = [1, 0]
+    #redis_mock.exists.side_effect = exists
+
+    assert redis_map.user_exists('R3Ea3')
+    assert redis_map.user_exists('NOPE') == False

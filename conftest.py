@@ -55,6 +55,8 @@ def map_with_data(redis_map, redis_conn):
         'R3Ea3': [24.93545, 60.16952],
         'O6zkQ': [18.0649, 59.33258]
     }}
+    redis_conn.set('user:R3Ea3', '1')
+    redis_conn.set('user:O6zkQ', '2')
     redis_conn.set('initials:R3Ea3', 'A A')
     redis_conn.set('initials:O6zkQ', 'B B')
     yield

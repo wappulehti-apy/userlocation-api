@@ -23,11 +23,14 @@ class RedisMap():
     def _get_public_id(self, id):
         return hashids.encode(id)
 
+    def user_exists(self, public_id):
+        return self.r.exists(f'{self.userkey}:{public_id}') == 1
+
     def expire_locations(self):
         for key in self.r.zscan_iter(self.locationkey):
             public_id = key[0]
             # Check if user has timed out
-            if not self.r.exists(f'{self.userkey}:{public_id}'):
+            if not self.user_exists(public_id):
                 self.app.logger.info(f'expiring user {public_id}')
                 self.r.zrem(self.locationkey, public_id)
 

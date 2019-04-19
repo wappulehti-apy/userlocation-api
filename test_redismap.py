@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock, call
 from config import Testing as config
-from redismap import RedisMap
+from redismap import RedisMap, Location
 
 
 @pytest.fixture(scope='function')
@@ -36,7 +36,7 @@ def test_expire_locations_removes_user(redis_mock, redis_map_mock):
     redis_mock.zrem.assert_called_with('loc', '3eA43')
 
 
-def test_get_location_returns_users(redis_mock, redis_map_mock):
+def test_get_locations_returns_users(redis_mock, redis_map_mock):
     redis_mock.get.side_effect = ['A A']
     redis_mock.georadius.side_effect = [[('R3Ea3', [24.0, 60.0])]]
 
@@ -48,7 +48,7 @@ def test_get_location_returns_users(redis_mock, redis_map_mock):
     redis_mock.get.assert_called_with('initials:R3Ea3')
 
 
-def test_get_location_does_not_return_expired_users(redis_mock, redis_map_mock):
+def test_get_locations_does_not_return_expired_users(redis_mock, redis_map_mock):
     redis_mock.get.side_effect = ['A A', None]
     redis_mock.georadius.side_effect = [[('R3Ea3', [24.0, 60.0]), ('O6zkQ', [25.0, 59.0])]]
 
@@ -60,4 +60,15 @@ def test_get_location_does_not_return_expired_users(redis_mock, redis_map_mock):
     assert redis_mock.get.mock_calls == [
         call('initials:R3Ea3'),
         call('initials:O6zkQ')
+    ]
+
+
+def test_get_locations_named_returns_named_tuple(redis_mock, redis_map_mock):
+    redis_mock.get.side_effect = ['A A']
+    redis_mock.georadius.side_effect = [[('R3Ea3', [24.0, 60.0])]]
+
+    locations = redis_map_mock.get_locations_named(0, 0)
+
+    assert locations == [
+        Location('R3Ea3', 24.0, 60.0, 'A A')
     ]

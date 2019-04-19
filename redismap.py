@@ -2,11 +2,10 @@ import os
 import datetime
 from flask import current_app as app
 from hashids import Hashids
+from collections import namedtuple
 
 hashids = Hashids(salt=os.getenv("SALT", "default"), min_length=5)
-
-# def generate_public_id(id):
-#     return hashids.encode(id)
+Location = namedtuple('Location', ['public_id', 'longitude', 'latitude', 'initials'])
 
 
 class RedisMap():
@@ -37,6 +36,10 @@ class RedisMap():
         locations_with_initials = [(*loc, self.r.get(f'{self.initialskey}:{loc[0]}')) for loc in locations]
         # Filter out timed out users
         return list(filter(lambda l: l[2] is not None, locations_with_initials))
+
+    def get_locations_named(self, *args, **kwargs):
+        locations = self.get_locations(*args, **kwargs)
+        return [Location(loc[0], loc[1][0], loc[1][1], loc[2]) for loc in locations]
 
     def add_or_update_user(self, id, initials, public_id=None):
         expire_seconds = 60 * 5

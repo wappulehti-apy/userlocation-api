@@ -1,9 +1,6 @@
 from datetime import datetime, timedelta
 from flask import current_app as app
 from flask import Blueprint, request, jsonify, session
-from sqlalchemy.exc import SQLAlchemyError
-
-from models import Location, generate_public_id
 from redismap import RedisMap
 from webhook import Webhook
 from database import db
@@ -26,6 +23,7 @@ def get_locations():
     try:
         # Fetch sellers
         locations = redis_map.get_locations(24.0, 60.0, 1000)
+        app.logger.debug(locations)
         response = {'sellers': [redis_map.to_json(l) for l in locations]}
         # Fetch requestcall
         buyer_id = request.headers.get('sessionId')

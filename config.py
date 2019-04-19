@@ -18,12 +18,13 @@ class Config(object):
     REDIS_URL = os.getenv("REDIS_URL")
     CORS_ORIGINS = [
         'https://apy.fi',
-        'https://www.apy.fi'
+        'https://www.apy.fi',
         'https://osta.apy.fi',
         'https://xn--py-uia.fi',
         'https://www.xn--py-uia.fi',
         'https://osta.xn--py-uia.fi',
     ]
+    #CORS_HEADERS = ['Content-Type', 'Authorization']
 
 
 class Develop(Config):

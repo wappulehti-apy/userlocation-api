@@ -2,12 +2,10 @@
 import os
 from flask import Flask
 from flask_basicauth import BasicAuth
-#from flask_migrate import Migrate
 from flask_cors import CORS
 import logging
 from redismap import RedisMap
 
-#migrate = Migrate()
 basic_auth = BasicAuth()
 redis_map = RedisMap()
 
@@ -26,11 +24,9 @@ def create_app(redis_conn=None):
     app.logger.info(f'APP_SETTINGS from {settings_class}')
     app.config.from_object(settings_class)
     CORS(app, origins=app.config['CORS_ORIGINS'], support_credentials=True)
-    logging.getLogger('flask_cors').level = logging.DEBUG
 
     from database import db
     db.init_app(app)
-    #migrate.init_app(app, db)
     basic_auth.init_app(app)
 
     if redis_conn is None:

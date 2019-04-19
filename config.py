@@ -24,7 +24,6 @@ class Config(object):
         'https://www.xn--py-uia.fi',
         'https://osta.xn--py-uia.fi',
     ]
-    #CORS_HEADERS = ['Content-Type', 'Authorization']
 
 
 class Develop(Config):

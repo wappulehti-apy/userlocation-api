@@ -16,6 +16,14 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WEBHOOK_URL = os.getenv('WEBHOOK_URL')
     REDIS_URL = os.getenv("REDIS_URL")
+    CORS_ORIGINS = [
+        'https://apy.fi',
+        'https://www.apy.fi'
+        'https://osta.apy.fi',
+        'https://xn--py-uia.fi',
+        'https://www.xn--py-uia.fi',
+        'https://osta.xn--py-uia.fi',
+    ]
 
 
 class Develop(Config):

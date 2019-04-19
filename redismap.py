@@ -33,7 +33,6 @@ class RedisMap():
 
     def get_locations(self, longitude, latitude, radius=10):
         users = self.r.georadius(self.locationkey, longitude, latitude, radius, unit='km', withcoord=True)
-        self.expire_locations()
         return users
 
     def add_or_update_user(self, id, initials=None, public_id=None):
@@ -52,6 +51,9 @@ class RedisMap():
     def to_json(location):
         return {
             'id': location[0],
-            'longitude': location[1][0],
-            'latitude': location[1][1]
+            'initials': 'A A',
+            'location':{
+                'lon': location[1][0],
+                'lat': location[1][1]
+            }
         }

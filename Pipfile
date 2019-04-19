@@ -25,6 +25,7 @@ requests = "*"
 gevent = "*"
 fakeredis = "*"
 redis = "*"
+flask-cors = "*"
 
 [requires]
 python_version = "3.7"

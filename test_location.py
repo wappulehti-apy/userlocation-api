@@ -4,6 +4,7 @@ from unittest.mock import patch, MagicMock
 from base64 import b64encode
 from config import Testing as config
 
+
 def with_auth(original={}):
     username = config.BASIC_AUTH_USERNAME
     password = config.BASIC_AUTH_PASSWORD
@@ -52,28 +53,28 @@ def test_get_locations_returns_callrequest_if_set(client, map_with_data, redis_c
 def test_set_location(client, redis_map, redis_conn):
     user_id = 123
     r = client.get(f'/location/set/{user_id}?latitude=60.16952&longitude=24.93545&initials=B%20A', headers=with_auth())
-    locations = redis_conn.data
-    assert len(locations) == 1
-    assert locations[0].id == user_id
-    assert locations[0].initials == 'B A'
-    assert locations[0].latitude == 60.16952
-    assert locations[0].longitude == 24.93545
+
+    assert len(redis_conn.data['loc']) == 1
+    location = redis_conn.data['loc']['3GOM3']
+    assert location[0] == 24.93545
+    assert location[1] == 60.16952
+    assert redis_conn.get('initials:3GOM3') == 'B A'
 
 
-def test_tests_dont_leak(client, db_session):
-    locations = Location.query.all()
-    assert len(locations) == 0
+def test_tests_dont_leak(client, redis_conn):
+    locations = redis_conn.data.get('loc')
+    assert locations is None
 
 # def test_location_expires(client, db_with_data):
 #     pass
 
 
-def test_set_location_updates_existing(client, map_with_data):
-    original = Location.query.get(1)
+def test_set_location_updates_existing(client, redis_map, map_with_data):
+    original = redis_map.get_locations_named(0, 0)[0]
     assert original.longitude == 24.93545
     assert original.initials == "A A"
     r = client.get(f'/location/set/1?latitude=60.16952&longitude=30.00000&initials=B%20B', headers=with_auth())
-    new = Location.query.get(1)
+    new = redis_map.get_locations_named(0, 0)[0]
     assert new.longitude == 30.00000
     assert new.initials == "B B"
 

@@ -8,6 +8,8 @@ from redismap import RedisMap
 @pytest.fixture(scope='session')
 def redis_conn():
     class AugmentedFakeredis(FakeRedis):
+        "implements geoadd and georadius for FakeRedis"
+
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
             self.data = {}
@@ -15,12 +17,17 @@ def redis_conn():
         def geoadd(self, key, longitude, latitude, value):
             assert isinstance(key, str)
             assert isinstance(value, str)
-            insert_tuple = (value, [longitude, latitude])
-            self.data.setdefault(key, []).append(insert_tuple)
+            insert = [longitude, latitude]
+
+            self.data.setdefault(key, {})
+            self.data[key] = {value: insert}
 
         def georadius(self, key, longitude, latitude, radius, **kwargs):
             assert isinstance(key, str)
-            return self.data.get(key, [])
+            try:
+                return [(id, coordinates) for id, coordinates in self.data.get(key).items()]
+            except AttributeError:
+                return []
 
     return AugmentedFakeredis(decode_responses=True)
 
@@ -31,7 +38,7 @@ def app(redis_conn):
     yield _app
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def client(app):
     client = app.test_client()
 
@@ -44,10 +51,14 @@ def client(app):
 
 @pytest.fixture(scope="function")
 def map_with_data(redis_map, redis_conn):
-    redis_conn.data = {'loc': [
-        ('R3Ea3', [24.93545, 60.16952]),
-        ('O6zkQ', [18.0649, 59.33258])
-    ]}
+    redis_conn.data = {'loc': {
+        'R3Ea3': [24.93545, 60.16952],
+        'O6zkQ': [18.0649, 59.33258]
+    }}
+    redis_conn.set('initials:R3Ea3', 'A A')
+    redis_conn.set('initials:O6zkQ', 'B B')
+    yield
+    redis_conn.data = {}
 
 
 @pytest.fixture(scope='function')
@@ -58,6 +69,7 @@ def redis_mock(redis_conn):
 @pytest.fixture(scope='function')
 def redis_map(redis_conn):
     yield RedisMap(MagicMock(), redis_conn)
+    redis_conn.data = {}
 
 
 @pytest.fixture(scope='function')

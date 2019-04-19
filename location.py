@@ -23,7 +23,6 @@ def get_locations():
     try:
         # Fetch sellers
         locations = redis_map.get_locations(24.0, 60.0, 1000)
-        app.logger.debug(locations)
         response = {'sellers': [redis_map.to_json(l) for l in locations]}
         # Fetch requestcall
         buyer_id = request.headers.get('sessionId')

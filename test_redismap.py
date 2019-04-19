@@ -75,8 +75,12 @@ def test_get_locations_named_returns_named_tuple(redis_mock, redis_map_mock):
 
 
 def test_user_exists(redis_map, redis_conn, map_with_data):
-    #exists = side_eddects = [1, 0]
-    #redis_mock.exists.side_effect = exists
-
     assert redis_map.user_exists('R3Ea3')
     assert redis_map.user_exists('NOPE') == False
+
+
+def test_user_id(redis_map, redis_conn, map_with_data):
+    assert isinstance(redis_map.user_id('R3Ea3'), int)
+    assert redis_map.user_id('R3Ea3') == 1
+    assert redis_map.user_id('O6zkQ') == 2
+    assert redis_map.user_id('NOPE') is None

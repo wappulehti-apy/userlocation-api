@@ -23,6 +23,12 @@ class RedisMap():
     def _get_public_id(self, id):
         return hashids.encode(id)
 
+    def user_id(self, public_id):
+        try:
+            return int(self.r.get(f'{self.userkey}:{public_id}'))
+        except TypeError:
+            return None
+
     def user_exists(self, public_id):
         return self.r.exists(f'{self.userkey}:{public_id}') == 1
 

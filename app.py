@@ -1,13 +1,33 @@
-
+import sys
+import logging
 import os
 from flask import Flask
 from flask_basicauth import BasicAuth
 from flask_cors import CORS
-import logging
 from redismap import RedisMap
+from apscheduler.schedulers.gevent import GeventScheduler
 
+
+def create_logger(name):
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    logger.addHandler(handler)
+    return logger
+
+
+# from apscheduler.schedulers.background import BackgroundScheduler as GeventScheduler
+
+bglogger = create_logger(__name__)
+scheduler = GeventScheduler()
 basic_auth = BasicAuth()
 redis_map = RedisMap()
+
+
+@scheduler.scheduled_job('interval', id='clean_redis', minutes=5)
+def clean_redis():
+    bglogger.info('BG: cleaning redis')
+    redis_map.expire_locations()
 
 
 def create_app(redis_conn=None):
@@ -35,5 +55,11 @@ def create_app(redis_conn=None):
     else:
         app.redis = redis_conn
     redis_map.init_app(app, app.redis)
+
+    if app.config['TESTING']:
+        pass
+    else:
+        scheduler.start()
+        bglogger.info('BG: started')
 
     return app

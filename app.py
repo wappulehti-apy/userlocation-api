@@ -45,8 +45,8 @@ def create_app(redis_conn=None):
     app.config.from_object(settings_class)
     CORS(app, origins=app.config['CORS_ORIGINS'], supports_credentials=True)
 
-    from database import db
-    db.init_app(app)
+    # from database import db
+    # db.init_app(app)
     basic_auth.init_app(app)
 
     if redis_conn is None:

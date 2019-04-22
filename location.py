@@ -3,7 +3,6 @@ from flask import current_app as app
 from flask import Blueprint, request, jsonify, session
 from redismap import RedisMap
 from webhook import Webhook
-from database import db
 
 location = Blueprint('location', __name__, url_prefix='/location')
 from app import basic_auth, redis_map  # NOQA

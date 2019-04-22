@@ -2,8 +2,6 @@ import pytest
 from unittest.mock import patch, MagicMock
 from base64 import b64encode
 from config import Testing as config
-from database import db
-from models import Location
 
 
 def with_auth(original={}):

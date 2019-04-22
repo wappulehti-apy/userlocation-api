@@ -20,7 +20,8 @@ class RedisMap():
         self.app = app
         self.r = redis_conn
 
-    def _get_public_id(self, id):
+    @staticmethod
+    def get_public_id(id):
         return hashids.encode(id)
 
     def user_id(self, public_id):
@@ -52,13 +53,13 @@ class RedisMap():
 
     def add_or_update_user(self, id, initials, public_id=None):
         expire_seconds = 60 * 5
-        public_id = public_id or self._get_public_id(id)
+        public_id = public_id or self.get_public_id(id)
         self.r.setex(f'{self.userkey}:{public_id}', expire_seconds, str(id))
         self.r.setex(f'{self.initialskey}:{public_id}', expire_seconds, initials)
         # TODO exception handling
 
     def update_user_location(self, id, longitude, latitude, initials):
-        public_id = self._get_public_id(id)
+        public_id = self.get_public_id(id)
         self.r.geoadd(self.locationkey, longitude, latitude, public_id)
         self.add_or_update_user(id, initials, public_id=public_id)
         # TODO exception handling

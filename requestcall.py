@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 from flask import current_app as app
 from flask import Blueprint, request, jsonify, session
 
-from models import Location, generate_public_id
+#from models import Location, generate_public_id
+from redismap import RedisMap
 from webhook import Webhook
 
 requestcall = Blueprint('requestcall', __name__, url_prefix='/requestcall')
@@ -39,7 +40,7 @@ def post_respond():
         app.logger.info(f'user_id missing')
         return jsonify({'error': True, 'message': 'user_id missing'}), 400
 
-    seller_id = generate_public_id(user_id)
+    seller_id = RedisMap.get_public_id(user_id)
     requestcall_response = {'response': response, 'seller_id': seller_id}
     app.logger.info(f'response for buyer {buyer_id}: {response}')
     app.redis.hmset(f'response:{buyer_id}', requestcall_response)

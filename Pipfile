@@ -19,6 +19,8 @@ requests = "*"
 redis = "*"
 flask-cors = "*"
 flask-restful = "*"
+gunicorn = "*"
+gevent = "*"
 
 [requires]
 python_version = "3.8"

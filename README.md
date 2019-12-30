@@ -2,12 +2,46 @@
 
 Simple webapp for setting and getting locations based on user id's.
 
-## Getting started
-# Configuration
-The following environment variables are available:
-- `BASIC_AUTH_USERNAME` specifies username for HTTP basic auth
-- `BASIC_AUTH_PASSWORD` specifies password for HTTP basic auth
+# Deployment to Heroku (example)
+### Prerequisites
 
+Sign upp for an heroku account, download the heroku CLI and log in.
+
+### Create an application
+
+```bash
+heroku create --region eu <myapp>
+heroku addons:create heroku-redis:hobby-dev
+```
+
+### Configuration
+
+To set the configuration variables,
+```bash
+heroku config:set BASIC_AUTH_USERNAME=<myusername>
+heroku config:set BASIC_AUTH_PASSWORD=<mypassword>
+heroku config:set FLASK_SECRET_KEY=<mysecretkey>
+heroku config:set SALT=<mysecretsalt>
+```
+These can be chosen arbitrarily, as long as they are sufficiently long.
+
+### Deployment using git
+
+Set the remote url.
+```bash
+heroku git:remote -a <myapp>
+```
+Deploy to heroku.
+```bash
+git push heroku master
+```
+
+Wait until deployment has succeeded (failed).
+
+Check if it works.
+```bash
+curl "https://<myapp>.herokuapp.com/locations"
+```
 
 ## Development
 

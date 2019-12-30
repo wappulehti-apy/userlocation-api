@@ -1,1 +1,1 @@
-web: gunicorn -k gevent "app:create_app()" --log-file=-
+web: gunicorn -k gevent "api:create_app()" --log-file=-

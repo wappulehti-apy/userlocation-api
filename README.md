@@ -23,5 +23,10 @@ Lint your code (PEP8)
 pipenv run lint
 ```
 
+Run tests
+```bash
+pipenv run pytest
+```
+
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

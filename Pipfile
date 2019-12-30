@@ -1,0 +1,24 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+autopep8 = "*"
+
+[packages]
+flask = "*"
+python-dotenv = "*"
+flask-basicauth = "*"
+pip = "*"
+hashids = "*"
+requests = "*"
+redis = "*"
+flask-cors = "*"
+flask-restful = "*"
+
+[requires]
+python_version = "3.8"
+
+[scripts]
+lint = "autopep8 --in-place --aggressive --aggressive --recursive --max-line-length 250 ."

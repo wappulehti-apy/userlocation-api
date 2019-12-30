@@ -5,7 +5,8 @@ from hashids import Hashids
 from collections import namedtuple
 
 hashids = Hashids(salt=os.getenv("SALT", "default"), min_length=5)
-Location = namedtuple('Location', ['public_id', 'longitude', 'latitude', 'nick'])
+Coordinate = namedtuple('Coordinate', ['longitude', 'latitude'])
+Location = namedtuple('Location', ['public_id', 'coordinate', 'nick'])
 
 
 class RedisMap():
@@ -44,20 +45,22 @@ class RedisMap():
 
     def get_locations(self, longitude, latitude, radius=10):
         locations = self.r.georadius(self.locationkey, longitude, latitude, radius, unit='km', withcoord=True)
-        locations_with_nick = [(*loc, self.r.get(f'{self.nickkey}:{loc[0]}')) for loc in locations]
+        locations_with_nick = [
+            Location(loc[0], Coordinate(*loc[1]), self.r.get(f'{self.nickkey}:{loc[0]}'))
+            for loc in locations]
+
         # Filter out timed out users
-        return list(filter(lambda l: l[2] is not None, locations_with_nick))
+        return list(filter(lambda l: l.nick is not None, locations_with_nick))
 
     def get_locations_named(self, *args, **kwargs):
         locations = self.get_locations(*args, **kwargs)
-        return [Location(loc[0], loc[1][0], loc[1][1], loc[2]) for loc in locations]
+        return [Location(loc[0], Coordinate(*loc[1]), loc[2]) for loc in locations]
 
     def add_or_update_user(self, id, nick, public_id=None):
         expire_seconds = 60 * 15
         public_id = public_id or self.get_public_id(id)
         self.r.setex(f'{self.userkey}:{public_id}', expire_seconds, str(id))
         self.r.setex(f'{self.nickkey}:{public_id}', expire_seconds, nick)
-        # TODO exception handling
 
     def update_user_location(self, id, longitude, latitude, nick):
         assert id is not None
@@ -65,7 +68,6 @@ class RedisMap():
         public_id = self.get_public_id(id)
         self.r.geoadd(self.locationkey, longitude, latitude, public_id)
         self.add_or_update_user(id, nick, public_id=public_id)
-        # TODO exception handling
 
     def remove_user_location(self, id):
         assert id is not None
@@ -76,15 +78,14 @@ class RedisMap():
         self.r.zrem(self.locationkey, public_id)
         self.r.delete(f'{self.userkey}:{public_id}')
         self.r.delete(f'{self.nickkey}:{public_id}')
-        # TODO exception handling
 
     @staticmethod
     def to_json(location):
         return {
-            'id': location[0],
-            'nick': location[2],
+            'id': location.public_id,
+            'nick': location.nick,
             'location': {
-                'lon': location[1][0],
-                'lat': location[1][1]
+                'lon': location.coordinate.longitude,
+                'lat': location.coordinate.latitude
             }
         }

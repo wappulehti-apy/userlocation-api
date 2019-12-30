@@ -71,3 +71,15 @@ def map_with_data(redis_map, redis_conn):
 def redis_map(redis_conn):
     yield RedisMap(MagicMock(), redis_conn)
     redis_conn.data = {}
+
+
+@pytest.fixture(scope='function')
+def redis_mock(redis_conn):
+    """A dummy redis connection"""
+    return MagicMock()
+
+
+@pytest.fixture(scope='function')
+def redis_map_mock(redis_mock):
+    """RedisMap with dummy app and redis connection"""
+    yield RedisMap(MagicMock(), redis_mock)

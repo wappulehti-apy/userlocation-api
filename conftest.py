@@ -1,4 +1,5 @@
 import pytest
+from math import sqrt
 from unittest.mock import patch, MagicMock
 from fakeredis import FakeRedis
 from api import create_app
@@ -24,6 +25,10 @@ def redis_conn():
 
         def georadius(self, key, longitude, latitude, radius, **kwargs):
             assert isinstance(key, str)
+            # naive radius check
+            if sqrt((24 - longitude) ** 2 + (60 - latitude) ** 2) > radius:
+                return []
+
             try:
                 return [(id, coordinates) for id, coordinates in self.data.get(key).items()]
             except AttributeError:

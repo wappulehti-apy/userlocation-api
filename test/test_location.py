@@ -27,6 +27,11 @@ def test_get_locations(client, map_with_data):
     ]}
 
 
+def test_get_locations_near_given_coordinates(client, map_with_data):
+    r = client.get('/locations?longitude=0.000000&latitude=0.000000')
+    assert r.get_json() == {'users': []}
+
+
 def test_set_location(client, redis_map, redis_conn):
     user_id = 123
     data = {
@@ -37,7 +42,6 @@ def test_set_location(client, redis_map, redis_conn):
     r = client.post(f'/locations/{user_id}', json=data, headers=with_auth())
 
     assert len(redis_conn.data['loc']) == 1
-    print(redis_conn.data['loc'])
     location = redis_conn.data['loc']['3GOM3']
     assert location[0] == 24.93545
     assert location[1] == 60.16952
@@ -63,7 +67,7 @@ def test_tests_dont_leak(client, redis_conn):
 
 
 def test_set_location_updates_existing(client, redis_map, map_with_data):
-    original = redis_map.get_locations_named(0, 0)[0]
+    original = redis_map.get_locations_named(24, 60)[0]
     assert original.coordinate.longitude == 24.93545
     assert original.nick == "A A"
     data = {
@@ -72,7 +76,7 @@ def test_set_location_updates_existing(client, redis_map, map_with_data):
         'nick': 'B B'
     }
     r = client.post(f'/locations/1', json=data, headers=with_auth())
-    new = redis_map.get_locations_named(0, 0)[0]
+    new = redis_map.get_locations_named(24, 60)[0]
     assert new.coordinate.longitude == 30.00000
     assert new.nick == "B B"
 

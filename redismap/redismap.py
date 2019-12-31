@@ -72,9 +72,7 @@ class RedisMap():
     def remove_user_location(self, id):
         assert id is not None
         assert id != ''
-        print('removing', id)
         public_id = self.get_public_id(id)
-        print(public_id)
         self.r.zrem(self.locationkey, public_id)
         self.r.delete(f'{self.userkey}:{public_id}')
         self.r.delete(f'{self.nickkey}:{public_id}')

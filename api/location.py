@@ -1,6 +1,5 @@
 from api.auth import basic_auth
 from redismap import redis_map
-from datetime import datetime, timedelta
 from flask import current_app as app
 from flask import request
 from flask_restful import Resource, reqparse
@@ -38,7 +37,7 @@ class LocationList(Resource):
 
 
 class Location(Resource):
-    method_decorators = {'post': [basic_auth.required]}
+    method_decorators = [basic_auth.required]
 
     parser = reqparse.RequestParser()
     parser.add_argument('longitude', type=float, required=True, help='longitude in format "24.123456', default=24.0)

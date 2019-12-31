@@ -1,6 +1,10 @@
 # GPS map for multiple users
 
-Simple webapp for setting and getting locations based on user id's.
+Simple webapp for setting and getting locations based on user id's. Also allows sending messages to users.
+
+## Features
+* api for setting and getting user locations based (authenticated)
+* api for sending messages to users based on a public_id and receiving responses (unauthenticated)
 
 # Deployment to Heroku (example)
 ### Prerequisites

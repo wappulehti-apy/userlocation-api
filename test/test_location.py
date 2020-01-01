@@ -54,7 +54,7 @@ def test_set_location_validates_args(client, redis_map, redis_conn):
 
     assert r.status == '400 BAD REQUEST'
     assert json['error']
-    assert json['message'] == 'Bad Request'
+    assert json['message'].startswith('invalid longitude')
 
 
 def test_tests_dont_leak(client, redis_conn):

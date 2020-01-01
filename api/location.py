@@ -40,22 +40,16 @@ class Location(Resource):
     method_decorators = [basic_auth.required]
 
     parser = reqparse.RequestParser()
-    parser.add_argument('longitude', type=float, required=True, help='longitude in format "24.123456', default=24.0)
-    parser.add_argument('latitude', type=float, required=True, help='latitude in format "60.123456', default=60.0)
+    parser.add_argument('longitude', type=float, required=True, help='longitude in format "24.123456"', default=24.0)
+    parser.add_argument('latitude', type=float, required=True, help='latitude in format "60.123456"', default=60.0)
     parser.add_argument('nick', type=str, help='user identifier')
 
     def post(self, user_id):
         app.logger.info('update location "%s" (%s)', user_id, request.remote_addr)
 
-        try:
-            args = self.parser.parse_args()
-            validate_location(args.longitude, args.latitude)
-            redis_map.update_user_location(user_id, args.longitude, args.latitude, args.nick)
-        except HTTPException as err:
-            return {'error': True, 'message': err.name, 'detail': err.data.get('message')}, err.code
-        except BaseException as err:
-            app.logger.error(err)
-            return {'error': True, 'message': 'unknown error', 'detail': str(err)}, 500
+        args = self.parser.parse_args()
+        validate_location(args.longitude, args.latitude)
+        redis_map.update_user_location(user_id, args.longitude, args.latitude, args.nick)
 
         app.logger.info('location "%s" set to lon==%f, lat=%f', user_id, args.longitude, args.latitude)
         return {'success': True}
@@ -63,12 +57,6 @@ class Location(Resource):
     def delete(self, user_id):
         app.logger.info('remove location "%s" (%s)', user_id, request.remote_addr)
 
-        try:
-            redis_map.remove_user_location(user_id)
-        except HTTPException as err:
-            return {'error': True, 'message': err.name, 'detail': err.data.get('message')}, err.code
-        except BaseException as err:
-            app.logger.error(err)
-            return {'error': True, 'message': 'unknown error', 'detail': str(err)}, 500
+        redis_map.remove_user_location(user_id)
 
         return {'success': True}

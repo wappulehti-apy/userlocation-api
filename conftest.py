@@ -66,8 +66,6 @@ def map_with_data(redis_map, redis_conn):
         'hashof1': [24.93545, 60.16952],
         'hashof2': [18.0649, 59.33258]
     }}
-    redis_conn.set('user:hashof1', '1')
-    redis_conn.set('user:hashof2', '2')
     redis_conn.set('nick:hashof1', 'Abe')
     redis_conn.set('nick:hashof2', 'Bob')
     yield
@@ -85,8 +83,15 @@ class FakeHashids:
     @staticmethod
     def decode(hash):
         """hashof123 -> 123"""
-        assert isinstance(id, str)
+        assert isinstance(hash, str)
         return int(hash[6:])
+
+# Replace Hashids in all tests with FakeHashids
+@pytest.fixture(scope='session', autouse=True)
+def fake_hashids():
+    with patch('redismap.redismap.Hashids.encode', side_effect=FakeHashids.encode),\
+            patch('redismap.redismap.Hashids.decode', side_effect=FakeHashids.decode):
+        yield
 
 
 @pytest.fixture(scope='function')
@@ -104,6 +109,4 @@ def redis_mock(redis_conn):
 @pytest.fixture(scope='function')
 def redis_map_mock(redis_mock):
     """RedisMap with dummy app and redis connection"""
-    with patch('redismap.redismap.Hashids.encode', side_effect=FakeHashids.encode),\
-            patch('redismap.redismap.Hashids.decode', side_effect=FakeHashids.decode):
-        yield RedisMap(MagicMock(), redis_mock)
+    yield RedisMap(MagicMock(), redis_mock)

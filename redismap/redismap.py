@@ -12,7 +12,6 @@ Location = namedtuple('Location', ['public_id', 'coordinate', 'nick'])
 class RedisMap():
     def __init__(self, app=None, redis_conn=None):
         self.locationkey = 'loc'
-        self.userkey = 'user'
         self.nickkey = 'nick'
         if app is not None or redis_conn is not None:
             self.init_app(app, redis_conn)
@@ -26,14 +25,17 @@ class RedisMap():
         # seems int casting is necessary
         return hashids.encode(int(id))
 
-    def user_id(self, public_id):
-        try:
-            return int(self.r.get(f'{self.userkey}:{public_id}'))
-        except (ValueError, TypeError):
+    def get_user_id(self, public_id):
+        if not self.user_exists(public_id):
             return None
+        return hashids.decode(public_id)
+
+    def get_nick(self, public_id):
+        return self.r.get(f'{self.nickkey}:{public_id}')
 
     def user_exists(self, public_id):
-        return self.r.exists(f'{self.userkey}:{public_id}') == 1
+        """if nickkey:public_id exists, user exists."""
+        return self.r.exists(f'{self.nickkey}:{public_id}') == 1
 
     def expire_locations(self):
         for key in self.r.zscan_iter(self.locationkey):
@@ -46,7 +48,7 @@ class RedisMap():
     def get_locations(self, longitude, latitude, radius=10):
         locations = self.r.georadius(self.locationkey, longitude, latitude, radius, unit='km', withcoord=True)
         locations_with_nick = [
-            Location(loc[0], Coordinate(*loc[1]), self.r.get(f'{self.nickkey}:{loc[0]}'))
+            Location(loc[0], Coordinate(*loc[1]), self.get_nick(loc[0]))
             for loc in locations]
 
         # Filter out timed out users
@@ -59,7 +61,6 @@ class RedisMap():
     def add_or_update_user(self, id, nick, public_id=None):
         expire_seconds = 60 * 15
         public_id = public_id or self.get_public_id(id)
-        self.r.setex(f'{self.userkey}:{public_id}', expire_seconds, str(id))
         self.r.setex(f'{self.nickkey}:{public_id}', expire_seconds, nick)
 
     def update_user_location(self, id, longitude, latitude, nick):
@@ -74,7 +75,6 @@ class RedisMap():
         assert id != ''
         public_id = self.get_public_id(id)
         self.r.zrem(self.locationkey, public_id)
-        self.r.delete(f'{self.userkey}:{public_id}')
         self.r.delete(f'{self.nickkey}:{public_id}')
 
     @staticmethod

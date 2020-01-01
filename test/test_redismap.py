@@ -15,7 +15,6 @@ def test_add_user_uses_setex(redis_mock, redis_map_mock):
     redis_map_mock.add_or_update_user(999, 'Abe')
 
     assert redis_mock.setex.mock_calls == [
-        call('user:hashof999', 900, '999'),
         call('nick:hashof999', 900, 'Abe')
     ]
 
@@ -80,8 +79,8 @@ def test_user_exists(redis_map, redis_conn, map_with_data):
     assert redis_map.user_exists('NOPE') == False
 
 
-def test_user_id(redis_map, redis_conn, map_with_data):
-    assert isinstance(redis_map.user_id('hashof1'), int)
-    assert redis_map.user_id('hashof1') == 1
-    assert redis_map.user_id('hashof2') == 2
-    assert redis_map.user_id('NOPE') is None
+def test_get_user_id(redis_map, map_with_data):
+    assert isinstance(redis_map.get_user_id('hashof1'), int)
+    assert redis_map.get_user_id('hashof1') == 1
+    assert redis_map.get_user_id('hashof2') == 2
+    assert redis_map.get_user_id('NOPE') is None

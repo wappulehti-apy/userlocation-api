@@ -7,6 +7,7 @@ from werkzeug.exceptions import HTTPException
 from functools import wraps
 from webhook import webhook
 from flask import current_app as app
+from redismap import RedisMap
 
 
 def validate_client_id(f):
@@ -73,4 +74,26 @@ class Message(Resource):
         if not webhook.send(client_id=client_id, user_id=args.user_id, message=args.message):
             app.logger.error('message webhook failed')
             return {'success': False, 'error': True}, 500
+        return {'success': True}
+
+
+class Response(Resource):
+    method_decorators = [basic_auth.required]
+
+    parser = reqparse.RequestParser()
+    parser.add_argument('user_id', type=int, required=True)
+    parser.add_argument('response', type=str, required=True)
+
+    def post(self, client_id):
+        validate_client_id(client_id)
+
+        args = self.parser.parse_args()
+        assert isinstance(args.response, str)
+
+        app.logger.info('response to message from "%s" by "%s" (%s)', client_id, args.user_id, request.remote_addr)
+
+        public_id = RedisMap.get_public_id(args.user_id)
+
+        app.redis.hmset(f'response:{client_id}', {'response': args.response, 'user_id': public_id})
+
         return {'success': True}

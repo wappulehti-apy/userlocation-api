@@ -22,8 +22,8 @@ def test_response_is_json(client):
 def test_get_locations(client, map_with_data):
     r = client.get('/locations')
     assert r.get_json() == {'users': [
-        {'id': 'R3Ea3', 'nick': 'A A', 'location': {'lat': 60.16952, 'lon': 24.93545}},
-        {'id': 'O6zkQ', 'nick': 'B B', 'location': {'lat': 59.33258, 'lon': 18.0649}}
+        {'id': 'hashof1', 'nick': 'Abe', 'location': {'lat': 60.16952, 'lon': 24.93545}},
+        {'id': 'hashof2', 'nick': 'Bob', 'location': {'lat': 59.33258, 'lon': 18.0649}}
     ]}
 
 
@@ -37,19 +37,19 @@ def test_set_location(client, redis_map, redis_conn):
     data = {
         'latitude': 60.16952,
         'longitude': 24.93545,
-        'nick': 'B A'
+        'nick': 'Changed'
     }
     r = client.post(f'/locations/{user_id}', json=data, headers=with_auth())
 
     assert len(redis_conn.data['loc']) == 1
-    location = redis_conn.data['loc']['3GOM3']
+    location = redis_conn.data['loc']['hashof123']
     assert location[0] == 24.93545
     assert location[1] == 60.16952
-    assert redis_conn.get('nick:3GOM3') == 'B A'
+    assert redis_conn.get('nick:hashof123') == 'Changed'
 
 
 def test_set_location_validates_args(client, redis_map, redis_conn):
-    r = client.post(f'/locations/123', json={'foo': 'bar', 'nick': 'A A'}, headers=with_auth())
+    r = client.post(f'/locations/123', json={'foo': 'bar', 'nick': 'Abe'}, headers=with_auth())
     json = r.get_json()
 
     assert r.status == '400 BAD REQUEST'
@@ -69,16 +69,16 @@ def test_tests_dont_leak(client, redis_conn):
 def test_set_location_updates_existing(client, redis_map, map_with_data):
     original = redis_map.get_locations_named(24, 60)[0]
     assert original.coordinate.longitude == 24.93545
-    assert original.nick == "A A"
+    assert original.nick == "Abe"
     data = {
         'latitude': 60.16952,
         'longitude': 30.00000,
-        'nick': 'B B'
+        'nick': 'Changed'
     }
     r = client.post(f'/locations/1', json=data, headers=with_auth())
     new = redis_map.get_locations_named(24, 60)[0]
     assert new.coordinate.longitude == 30.00000
-    assert new.nick == "B B"
+    assert new.nick == "Changed"
 
 
 def test_empty_response(client):
@@ -90,8 +90,8 @@ def test_response_schema(client, map_with_data):
     """Checks that output is as expected."""
     r = client.get('/locations')
     assert r.get_json() == {'users': [
-        {'id': 'R3Ea3', 'nick': 'A A', 'location': {'lat': 60.16952, 'lon': 24.93545}},
-        {'id': 'O6zkQ', 'nick': 'B B', 'location': {'lat': 59.33258, 'lon': 18.0649}}
+        {'id': 'hashof1', 'nick': 'Abe', 'location': {'lat': 60.16952, 'lon': 24.93545}},
+        {'id': 'hashof2', 'nick': 'Bob', 'location': {'lat': 59.33258, 'lon': 18.0649}}
     ]}
 
 

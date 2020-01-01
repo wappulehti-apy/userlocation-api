@@ -48,28 +48,45 @@ def app(redis_conn):
 
 @pytest.fixture(scope='function')
 def client(app):
-    client = app.test_client()
+    with patch('redismap.redismap.Hashids.encode', side_effect=FakeHashids.encode),\
+            patch('redismap.redismap.Hashids.decode', side_effect=FakeHashids.decode):
+        client = app.test_client()
 
-    # Establish an application context before running the tests.
-    ctx = app.app_context()
-    ctx.push()
-    yield client
-    ctx.pop()
+        # Establish an application context before running the tests.
+        ctx = app.app_context()
+        ctx.push()
+        yield client
+        ctx.pop()
 
 
 @pytest.fixture(scope="function")
 def map_with_data(redis_map, redis_conn):
     """Fixture with pre-populated test data."""
     redis_conn.data = {'loc': {
-        'R3Ea3': [24.93545, 60.16952],
-        'O6zkQ': [18.0649, 59.33258]
+        'hashof1': [24.93545, 60.16952],
+        'hashof2': [18.0649, 59.33258]
     }}
-    redis_conn.set('user:R3Ea3', '1')
-    redis_conn.set('user:O6zkQ', '2')
-    redis_conn.set('nick:R3Ea3', 'A A')
-    redis_conn.set('nick:O6zkQ', 'B B')
+    redis_conn.set('user:hashof1', '1')
+    redis_conn.set('user:hashof2', '2')
+    redis_conn.set('nick:hashof1', 'Abe')
+    redis_conn.set('nick:hashof2', 'Bob')
     yield
     redis_conn.data = {}
+
+
+class FakeHashids:
+    """Simple hashes for testing."""
+    @staticmethod
+    def encode(id):
+        """123 -> hashof123"""
+        assert isinstance(id, int)
+        return 'hashof' + str(id)
+
+    @staticmethod
+    def decode(hash):
+        """hashof123 -> 123"""
+        assert isinstance(id, str)
+        return int(hash[6:])
 
 
 @pytest.fixture(scope='function')
@@ -87,4 +104,6 @@ def redis_mock(redis_conn):
 @pytest.fixture(scope='function')
 def redis_map_mock(redis_mock):
     """RedisMap with dummy app and redis connection"""
-    yield RedisMap(MagicMock(), redis_mock)
+    with patch('redismap.redismap.Hashids.encode', side_effect=FakeHashids.encode),\
+            patch('redismap.redismap.Hashids.decode', side_effect=FakeHashids.decode):
+        yield RedisMap(MagicMock(), redis_mock)

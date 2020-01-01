@@ -5,7 +5,7 @@ from helpers import with_auth
 
 _DUMMY_CLIENT_ID = 'a' * 25
 _VALID_DATA = {
-    'user_id': 'R3Ea3',
+    'user_id': 'hashof1',
     'message': '040123456'
 }
 
@@ -21,12 +21,12 @@ def test_get_message_requires_client_id(client):
 
 
 def test_get_message(client, redis_conn):
-    response = {'public_id': 'R3Ea3', 'data': 'accepted'}
+    response = {'public_id': 'hashof1', 'data': 'accepted'}
 
     redis_conn.hmset(f'response:{_DUMMY_CLIENT_ID}', response)
 
     r = client.get('/message', headers=with_client_id())
-    assert r.get_json() == {'response': {'public_id': 'R3Ea3', 'data': 'accepted'}}
+    assert r.get_json() == {'response': {'public_id': 'hashof1', 'data': 'accepted'}}
 
 
 def test_get_message_deletes_received_received_message_from_redis(client, redis_conn):
@@ -100,4 +100,4 @@ def test_post_response(client, redis_conn):
         r = client.post('/message/' + _DUMMY_CLIENT_ID, json=response, headers=with_auth())
 
     assert r.status == '200 OK'
-    redis_hmset.assert_called_with('response:' + _DUMMY_CLIENT_ID, {'response': 'accepted', 'user_id': 'R3Ea3'})
+    redis_hmset.assert_called_with('response:' + _DUMMY_CLIENT_ID, {'response': 'accepted', 'user_id': 'hashof1'})

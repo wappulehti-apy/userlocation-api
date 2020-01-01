@@ -21,9 +21,9 @@ def test_get_messages_requires_client_id(client):
 
 
 def test_get_messages(client, redis_conn):
-    requestcall_response = {'public_id': 'R3Ea3', 'data': 'accepted'}
+    response = {'public_id': 'R3Ea3', 'data': 'accepted'}
 
-    redis_conn.hmset(f'response:{_DUMMY_CLIENT_ID}', requestcall_response)
+    redis_conn.hmset(f'response:{_DUMMY_CLIENT_ID}', response)
 
     r = client.get('/message', headers=with_client_id())
     assert r.get_json() == {'response': {'public_id': 'R3Ea3', 'data': 'accepted'}}
@@ -86,3 +86,19 @@ def test_post_validates_message(client):
 
         r = client.post('/message', json={'user_id': 'foobar', 'message': '+12 (34)-56789'}, headers=with_client_id())
         assert r.get_json() == {'success': True}
+
+# post /message/<client_id>
+
+
+def test_post_response_requires_authentication(client):
+    r = client.post('/message/123')
+    assert r.status == '401 UNAUTHORIZED'
+
+
+def test_post_response(client, redis_conn):
+    response = {'user_id': 1, 'response': 'accepted'}
+    with patch.object(redis_conn, 'hmset') as redis_hmset:
+        r = client.post('/message/' + _DUMMY_CLIENT_ID, json=response, headers=with_auth())
+
+    assert r.status == '200 OK'
+    redis_hmset.assert_called_with('response:' + _DUMMY_CLIENT_ID, {'response': 'accepted', 'user_id': 'R3Ea3'})

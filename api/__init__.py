@@ -6,6 +6,7 @@ from flask_cors import CORS
 from flask_restful import Resource
 from redismap import redis_map
 from api.auth import basic_auth
+from webhook import webhook
 
 
 def create_app(redis_conn=None):
@@ -29,6 +30,9 @@ def create_app(redis_conn=None):
     basic_auth.init_app(app)
     app.logger.setLevel(logging.DEBUG)
     # app.url_map.strict_slashes = False
+
+    # Webhook
+    webhook.init_app(app, app.config['WEBHOOK_URL'])
 
     # Environment specific
     if settings_class == 'config.Config':

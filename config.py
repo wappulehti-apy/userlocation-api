@@ -28,3 +28,4 @@ class Testing(Config):
     SECRET_KEY = "mysecretkey"
     BASIC_AUTH_USERNAME = "myusername"
     BASIC_AUTH_PASSWORD = "mypassword"
+    WEBHOOK_URL = "https://example.com/webhook"

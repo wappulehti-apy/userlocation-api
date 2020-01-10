@@ -6,6 +6,8 @@ Simple webapp for setting and getting locations based on user id's. Also allows 
 * api for setting and getting user locations based (authenticated)
 * api for sending messages to users based on a public_id and receiving responses (unauthenticated)
 
+Messages from clients are sent to users using a webhook and users can respond back with a hook to the api.
+
 # Deployment to Heroku (example)
 ### Prerequisites
 
@@ -26,6 +28,7 @@ heroku config:set BASIC_AUTH_USERNAME=<myusername>
 heroku config:set BASIC_AUTH_PASSWORD=<mypassword>
 heroku config:set FLASK_SECRET_KEY=<mysecretkey>
 heroku config:set SALT=<mysecretsalt>
+heroku config:set WEBHOOK_URL=<mymessagewebhookurl>
 ```
 These can be chosen arbitrarily, as long as they are sufficiently long.
 
@@ -52,6 +55,11 @@ curl "https://<myapp>.herokuapp.com/locations"
 Install dev-dependencies
 ```bash
 pipenv install --dev
+```
+
+To run locally, do
+```bash
+docker-compose up --build
 ```
 
 ## Contributing

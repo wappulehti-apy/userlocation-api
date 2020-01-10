@@ -7,6 +7,12 @@ from flask_restful import Resource
 from redismap import redis_map
 from api.auth import basic_auth
 from webhook import webhook
+from bg import bg_jobs
+
+
+def is_main_workzeug_process():
+    # Workzeug (dev server) spawns also a child process
+    return os.getenv('WERKZEUG_RUN_MAIN') == 'true'
 
 
 def create_app(redis_conn=None):
@@ -36,13 +42,20 @@ def create_app(redis_conn=None):
 
     # Environment specific
     if settings_class == 'config.Config':
-        pass
+        from apscheduler.schedulers.gevent import GeventScheduler as Scheduler
+        bg_jobs.init_app(app, Scheduler)
     elif settings_class == 'config.Develop':
         from api import localtest
         app.register_blueprint(localtest.bp)
+
+        if is_main_workzeug_process():
+            from apscheduler.schedulers.background import BackgroundScheduler as Scheduler
+            bg_jobs.init_app(app, Scheduler)
     elif settings_class == 'config.Testing':
         pass
     else:
         raise Exception(f'Unknown settings_class: {settings_class}')
+
+    app.logger.info(f'Loaded {settings_class} configuration')
 
     return app

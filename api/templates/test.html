@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block script %}
+<script>
+  let testCases = [
+    ['GET', '/locations'],
+    ['GET', '/locations?latitude=60.2&longitude=25.0'],
+    ['POST', '/locations/123?latitude=60.16952&longitude=24.93545&nick=Abe'],
+    ['POST', '/locations/124?latitude=60.17200&longitude=25.0000&nick=Bob'],
+    ['DELETE', '/locations/123'],
+    ['DELETE', '/locations/124'],
+    ['GET', '/message'],
+    ['POST', '/message?public_id=3GOM3&message=040123456'],
+    ['POST', '/message/atotallyrandomassignedstring?user_id=123&response={"accept":true}'],
+  ];
+
+  for (const [i, c] of testCases.entries()) {
+    const method = c[0];
+    const endpoint = c[1];
+    document.querySelector("#testcases").innerHTML += `<li class="url sansserif"><button data-case="${i}">${method}</button> ${endpoint}</li>`
+  }
+</script>
+{% endblock %}

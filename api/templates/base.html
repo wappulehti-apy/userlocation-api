@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+  <title>local testing interface</title>
+  <style>
+    html {
+      font-family: sans-serif;
+      padding: 0;
+      font-size: 0.6rem;
+    }
+
+    #wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #bec6ce;
+    }
+
+    nav {
+      grid-column: 1 / span 2;
+      background: #5f6e7e;
+      padding: 0.1rem 0.5rem;
+      color: #fafbfb;
+      font-weight: bold;
+    }
+
+    .sansserif {
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .testcases ul {
+      list-style: none;
+      padding: 0 0.5rem;
+    }
+
+    button, input[type=button] {
+      width: 7rem;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    textarea {
+      min-height: 20rem;
+      background-color: #fafbfb;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="wrapper">
+    <nav>
+      local testing interface
+    </nav>
+    <textarea class="sansserif"></textarea>
+    <div class="testcases">
+      {% block content %}
+      <ul id="testcases">
+      </ul>
+      {% endblock %}
+    </div>
+  </div>
+  {% block script_base %}
+    <script>
+      var xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+          document.querySelector("textarea").innerHTML = xhr.response;
+      };
+      document.addEventListener('click', function (event) {
+        if (!event.target.matches('.url button')) return;
+        event.preventDefault();
+
+        const i = event.target.dataset.case;
+        // xhr with dummy user and pw
+        xhr.open(testCases[i][0], testCases[i][1], true, 'user', 'password');
+        if (testCases[i][1].startsWith('/message')) {
+          // add clientId if needed
+          xhr.setRequestHeader('clientId','atotallyrandomassignedstring')
+        }
+        xhr.send();
+      }, false);
+    </script>
+  {% endblock %}
+  {% block script %}{% endblock %}
+</body>
+</html>

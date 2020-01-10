@@ -8,7 +8,16 @@ Simple webapp for setting and getting locations based on user id's. Also allows 
 
 Messages from clients are sent to users using a webhook and users can respond back with a hook to the api.
 
-# Deployment to Heroku (example)
+## Running locally (docker)
+
+To run locally, do
+```bash
+docker-compose up --build
+```
+
+A local testing interface should be available at http://localhost:5000.
+
+## Deployment to Heroku (example)
 ### Prerequisites
 
 Sign upp for an heroku account, download the heroku CLI and log in.
@@ -56,13 +65,6 @@ Install dev-dependencies
 ```bash
 pipenv install --dev
 ```
-
-To run locally, do
-```bash
-docker-compose up --build
-```
-
-## Contributing
 
 Lint your code (PEP8)
 ```bash

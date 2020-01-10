@@ -22,6 +22,7 @@ flask-restful = "*"
 gunicorn = "*"
 gevent = "*"
 apscheduler = "*"
+flask-limiter = "*"
 
 [requires]
 python_version = "3.8"

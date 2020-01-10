@@ -1,0 +1,17 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    volumes:
+     - .:/api
+    environment:
+     - "APP_SETTINGS=config.Develop"
+    ports:
+     - "127.0.0.1:5000:5000"
+  redis:
+    image: "redis:alpine"
+    expose:
+     - "6379"
+    command: ["redis-server", "--loglevel", "warning"]

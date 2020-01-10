@@ -1,0 +1,14 @@
+FROM python:3.8.0
+
+ADD /requirements.txt /api/requirements.txt
+WORKDIR /api
+RUN pip install --no-cache-dir -q -r requirements.txt
+
+# Run the image as a non-root user
+RUN useradd --create-home --shell /bin/bash webuser
+USER webuser
+
+ADD . /api
+
+# CMD flask run --host=0.0.0.0
+CMD python -u runlocal.py

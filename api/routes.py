@@ -15,7 +15,7 @@ class ExtendedApi(Api):
             elif 'data' in err.__dict__:
                 msg = err.data.get('message')
                 if (isinstance(msg, dict)):
-                    response['message'] = ','.join([f'invalid {k}: {v}' for k, v in msg.items()])
+                    response['message'] = ','.join([f'invalid {k}: please specify {v}' for k, v in msg.items()])
                 else:
                     response['message'] = err.data.get('message')
             app.logger.error("%s", err)

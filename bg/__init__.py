@@ -3,6 +3,7 @@ from redis.exceptions import ConnectionError
 
 
 def expire_users(logger):
+    """Job for removing expired users' locations from redis."""
     logger.info('expiring old users')
     try:
         redis_map.expire_locations()

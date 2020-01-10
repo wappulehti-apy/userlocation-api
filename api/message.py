@@ -7,7 +7,7 @@ from werkzeug.exceptions import HTTPException
 from functools import wraps
 from webhook import webhook
 from flask import current_app as app
-from redismap import RedisMap
+from redismap import RedisMap, redis_map
 
 
 def validate_client_id(f):
@@ -40,14 +40,14 @@ def validate_args(args):
     """Validate client message. We expect message to be a plain phone number."""
     if not valid_phone_number(args.message):
         abort(400, description='invalid message: must be a valid phone number of format "(+)123 456789')
-    if len(args.user_id) < 5:
-        abort(400, description='invalid user_id')
+    if len(args.public_id) < 5:
+        abort(400, description='invalid public_id')
 
 
 class Message(Resource):
     method_decorators = [validate_client_id]
     parser = reqparse.RequestParser()
-    parser.add_argument('user_id', type=str, required=True)
+    parser.add_argument('public_id', type=str, required=True)
     parser.add_argument('message', type=str, required=True)
 
     def get(self):
@@ -69,9 +69,11 @@ class Message(Resource):
         args = self.parser.parse_args()
         validate_args(args)
 
-        app.logger.info('send message from "%s" to "%s" (%s)', client_id, args.user_id, request.remote_addr)
+        app.logger.info('send message from "%s" to "%s" (%s)', client_id, args.public_id, request.remote_addr)
 
-        if not webhook.send(client_id=client_id, user_id=args.user_id, message=args.message):
+        user_id = redis_map.get_user_id(args.public_id)
+
+        if not webhook.send(client_id=client_id, user_id=user_id, message=args.message):
             app.logger.error('message webhook failed')
             return {'success': False, 'error': True}, 500
         return {'success': True}
@@ -94,6 +96,6 @@ class Response(Resource):
 
         public_id = RedisMap.get_public_id(args.user_id)
 
-        app.redis.hmset(f'response:{client_id}', {'response': args.response, 'user_id': public_id})
+        app.redis.hmset(f'response:{client_id}', {'response': args.response, 'public_id': public_id})
 
         return {'success': True}

@@ -22,8 +22,8 @@ def test_response_is_json(client):
 def test_get_locations(client, map_with_data):
     r = client.get('/locations')
     assert r.get_json() == {'users': [
-        {'id': 'hashof1', 'nick': 'Abe', 'location': {'lat': 60.16952, 'lon': 24.93545}},
-        {'id': 'hashof2', 'nick': 'Bob', 'location': {'lat': 59.33258, 'lon': 18.0649}}
+        {'public_id': 'hashof1', 'nick': 'Abe', 'location': {'lat': 60.16952, 'lon': 24.93545}},
+        {'public_id': 'hashof2', 'nick': 'Bob', 'location': {'lat': 59.33258, 'lon': 18.0649}}
     ]}
 
 
@@ -90,8 +90,8 @@ def test_response_schema(client, map_with_data):
     """Checks that output is as expected."""
     r = client.get('/locations')
     assert r.get_json() == {'users': [
-        {'id': 'hashof1', 'nick': 'Abe', 'location': {'lat': 60.16952, 'lon': 24.93545}},
-        {'id': 'hashof2', 'nick': 'Bob', 'location': {'lat': 59.33258, 'lon': 18.0649}}
+        {'public_id': 'hashof1', 'nick': 'Abe', 'location': {'lat': 60.16952, 'lon': 24.93545}},
+        {'public_id': 'hashof2', 'nick': 'Bob', 'location': {'lat': 59.33258, 'lon': 18.0649}}
     ]}
 
 

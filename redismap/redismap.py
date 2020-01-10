@@ -80,7 +80,7 @@ class RedisMap():
     @staticmethod
     def to_json(location):
         return {
-            'id': location.public_id,
+            'public_id': location.public_id,
             'nick': location.nick,
             'location': {
                 'lon': location.coordinate.longitude,

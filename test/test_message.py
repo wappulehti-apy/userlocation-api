@@ -5,7 +5,7 @@ from helpers import with_auth
 
 _DUMMY_CLIENT_ID = 'a' * 25
 _VALID_DATA = {
-    'user_id': 'hashof1',
+    'public_id': 'hashof1',
     'message': '040123456'
 }
 
@@ -21,12 +21,12 @@ def test_get_message_requires_client_id(client):
 
 
 def test_get_message(client, redis_conn):
-    response = {'public_id': 'hashof1', 'data': 'accepted'}
+    response = {'public_id': 'hashof1', 'response': 'accepted'}
 
     redis_conn.hmset(f'response:{_DUMMY_CLIENT_ID}', response)
 
     r = client.get('/message', headers=with_client_id())
-    assert r.get_json() == {'response': {'public_id': 'hashof1', 'data': 'accepted'}}
+    assert r.get_json() == {'response': {'public_id': 'hashof1', 'response': 'accepted'}}
 
 
 def test_get_message_deletes_received_received_message_from_redis(client, redis_conn):
@@ -75,16 +75,16 @@ def test_post_message_returns_error_on_failure(client, map_with_data):
 
 def test_post_message_validates_message(client):
     with patch('requests.post', return_value=MagicMock(status_code=200)) as post:
-        r = client.post('/message', json={'user_id': 'foobar', 'message': 'notvalid'}, headers=with_client_id())
+        r = client.post('/message', json={'public_id': 'foobar', 'message': 'notvalid'}, headers=with_client_id())
         assert r.get_json()['message'].startswith('invalid message')
 
-        r = client.post('/message', json={'user_id': 'foobar', 'message': '123'}, headers=with_client_id())
+        r = client.post('/message', json={'public_id': 'foobar', 'message': '123'}, headers=with_client_id())
         assert r.get_json()['message'].startswith('invalid message')
 
-        r = client.post('/message', json={'user_id': 'foobar', 'message': '040123456'}, headers=with_client_id())
+        r = client.post('/message', json={'public_id': 'foobar', 'message': '040123456'}, headers=with_client_id())
         assert r.get_json() == {'success': True}
 
-        r = client.post('/message', json={'user_id': 'foobar', 'message': '+12 (34)-56789'}, headers=with_client_id())
+        r = client.post('/message', json={'public_id': 'foobar', 'message': '+12 (34)-56789'}, headers=with_client_id())
         assert r.get_json() == {'success': True}
 
 
@@ -100,4 +100,4 @@ def test_post_response(client, redis_conn):
         r = client.post('/message/' + _DUMMY_CLIENT_ID, json=response, headers=with_auth())
 
     assert r.status == '200 OK'
-    redis_hmset.assert_called_with('response:' + _DUMMY_CLIENT_ID, {'response': 'accepted', 'user_id': 'hashof1'})
+    redis_hmset.assert_called_with('response:' + _DUMMY_CLIENT_ID, {'response': 'accepted', 'public_id': 'hashof1'})

@@ -5,6 +5,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_restful import Resource
 from redismap import redis_map
+from api.limiter import rate_limiter
 from api.auth import basic_auth
 from webhook import webhook
 from bg import bg_jobs
@@ -36,6 +37,9 @@ def create_app(redis_conn=None):
     basic_auth.init_app(app)
     app.logger.setLevel(logging.DEBUG)
     # app.url_map.strict_slashes = False
+
+    # Rate Limiter
+    rate_limiter.init_app(app)
 
     # Webhook
     webhook.init_app(app, app.config['WEBHOOK_URL'])

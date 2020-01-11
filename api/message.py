@@ -1,5 +1,6 @@
 import re
 from api.auth import basic_auth
+from api.limiter import rate_limiter
 from flask import current_app as app
 from flask import request, abort
 from flask_restful import Resource, reqparse
@@ -45,7 +46,9 @@ def validate_args(args):
 
 
 class Message(Resource):
+    decorators = [rate_limiter.limit('10/minute')]
     method_decorators = [validate_client_id]
+
     parser = reqparse.RequestParser()
     parser.add_argument('public_id', type=str, required=True)
     parser.add_argument('message', type=str, required=True)

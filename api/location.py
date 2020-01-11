@@ -1,4 +1,5 @@
 from api.auth import basic_auth
+from api.limiter import rate_limiter
 from redismap import redis_map
 from flask import current_app as app
 from flask import request
@@ -15,6 +16,8 @@ def validate_location(longitude, latitude):
 
 
 class LocationList(Resource):
+    decorators = [rate_limiter.limit('10/minute')]
+
     FETCH_RADIUS = 25  # km
 
     parser = reqparse.RequestParser()

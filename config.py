@@ -14,12 +14,15 @@ class Config(object):
     WEBHOOK_URL = os.getenv('WEBHOOK_URL')
     REDIS_URL = os.getenv("REDIS_URL")
     CORS_ORIGINS = os.getenv("CORS_ORIGINS", "").split(",")
+    RATELIMIT_KEY_PREFIX = "ratelimit"
+    RATELIMIT_STORAGE_URL = REDIS_URL
 
 
 class Develop(Config):
     from dotenv import load_dotenv
     load_dotenv(verbose=True)
     REDIS_URL = "redis://redis"
+    RATELIMIT_STORAGE_URL = "memory://"
 
 
 class Testing(Config):
@@ -29,3 +32,5 @@ class Testing(Config):
     BASIC_AUTH_USERNAME = "myusername"
     BASIC_AUTH_PASSWORD = "mypassword"
     WEBHOOK_URL = "https://example.com/webhook"
+    RATELIMIT_ENABLED = False
+    RATELIMIT_STORAGE_URL = "memory://"

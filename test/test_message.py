@@ -76,10 +76,10 @@ def test_post_message_returns_error_on_failure(client, map_with_data):
 def test_post_message_validates_message(client):
     with patch('requests.post', return_value=MagicMock(status_code=200)) as post:
         r = client.post('/message', json={'public_id': 'foobar', 'message': 'notvalid'}, headers=with_client_id())
-        assert r.get_json()['message'].startswith('invalid message')
+        assert r.get_json()['message'].startswith('Bad Request: invalid message')
 
         r = client.post('/message', json={'public_id': 'foobar', 'message': '123'}, headers=with_client_id())
-        assert r.get_json()['message'].startswith('invalid message')
+        assert r.get_json()['message'].startswith('Bad Request: invalid message')
 
         r = client.post('/message', json={'public_id': 'foobar', 'message': '040123456'}, headers=with_client_id())
         assert r.get_json() == {'success': True}

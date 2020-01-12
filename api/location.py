@@ -24,13 +24,15 @@ class LocationList(Resource):
     FETCH_RADIUS = 25  # km
 
     parser = reqparse.RequestParser()
-    parser.add_argument('longitude', type=float, default=24.0)
-    parser.add_argument('latitude', type=float, default=60.0)
+    parser.add_argument('longitude', type=float)
+    parser.add_argument('latitude', type=float)
 
     def get(self):
         """List user locations.
 
         .. :quickref: User Location; List user locations.
+
+        If no cooridnates are supplied, all users will be returned.
 
         :query float longitude: (optional) Longitude around which to fetch users.
         :query float latitude: (optional) Latitude around which to fetch users.
@@ -38,10 +40,14 @@ class LocationList(Resource):
         """
         app.logger.info('location query from %s', request.remote_addr)
         args = self.parser.parse_args()
-        validate_location(args.longitude, args.latitude)
 
         # Fetch users
-        locations = redis_map.get_locations(args.longitude, args.latitude, self.FETCH_RADIUS)
+        if args.longitude is not None and args.latitude is not None:
+            validate_location(args.longitude, args.latitude)
+            locations = redis_map.get_locations(args.longitude, args.latitude, self.FETCH_RADIUS)
+        else:
+            # Fetch with maximum possible distance on earth
+            locations = redis_map.get_locations(0, 0, 22000)
         response = {'users': [redis_map.to_json(l) for l in locations]}
 
         return response

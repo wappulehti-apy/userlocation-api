@@ -23,19 +23,33 @@ def test_get_message_requires_client_id(client):
 def test_get_message(client, redis_conn):
     response = {'public_id': 'hashof1', 'response': 'accepted'}
 
-    redis_conn.hmset(f'response:{_DUMMY_CLIENT_ID}', response)
+    redis_conn.hmset(f'response:{_DUMMY_CLIENT_ID}:1', response)
 
     r = client.get('/message', headers=with_client_id())
-    assert r.get_json() == {'response': {'public_id': 'hashof1', 'response': 'accepted'}}
+    assert r.get_json() == {'responses': [{'public_id': 'hashof1', 'response': 'accepted'}]}
+
+
+def test_get_multiple_messages(client, redis_conn):
+    response = {'public_id': 'hashof1', 'response': 'accepted'}
+    response2 = {'public_id': 'hashof2', 'response': 'denied'}
+
+    redis_conn.hmset(f'response:{_DUMMY_CLIENT_ID}:1', response)
+    redis_conn.hmset(f'response:{_DUMMY_CLIENT_ID}:2', response2)
+
+    r = client.get('/message', headers=with_client_id())
+    assert r.get_json() == {'responses': [
+        response,
+        response2
+    ]}
 
 
 def test_get_message_deletes_received_received_message_from_redis(client, redis_conn):
-    redis_conn.hmset(f'response:{_DUMMY_CLIENT_ID}', {'foo': 'bar'})
+    redis_conn.hmset(f'response:{_DUMMY_CLIENT_ID}:1', {'foo': 'bar'})
 
     r = client.get('/message', headers=with_client_id())
-    assert r.get_json() == {'response': {'foo': 'bar'}}
+    assert r.get_json() == {'responses': [{'foo': 'bar'}]}
     r = client.get('/message', headers=with_client_id())
-    assert r.get_json() == {'response': {}}
+    assert r.get_json() == {'responses': []}
 
 
 # post /message
@@ -100,4 +114,4 @@ def test_post_response(client, redis_conn):
         r = client.post('/message/' + _DUMMY_CLIENT_ID, json=response, headers=with_auth())
 
     assert r.status == '200 OK'
-    redis_hmset.assert_called_with('response:' + _DUMMY_CLIENT_ID, {'response': 'accepted', 'public_id': 'hashof1'})
+    redis_hmset.assert_called_with(f'response:{_DUMMY_CLIENT_ID}:1', {'response': 'accepted', 'public_id': 'hashof1'})

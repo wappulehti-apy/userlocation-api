@@ -54,25 +54,29 @@ class Message(Resource):
     parser.add_argument('message', type=str, required=True)
 
     def get(self):
-        """Get response to client.
+        """Get responses to client.
 
-        .. :quickref: Message; Get users response to client.
+        .. :quickref: Message; Get users responses to client.
 
-        If a response to the clients message exists, it is returned. The returned message
-        is removed and is not returned on subsequent requests.
+        If a response to the clients message exists, it is returned. The returned messages
+        are removed and are not returned on subsequent requests.
 
-        :>json object response: response. Eg. :code:`{'response': {'public_id': 'abc123', 'response': 'accepted'}}`.
+        :>json List[string] responses: list of *string* responses. Eg. :code:`{'responses': [{'public_id': 'abc123', 'response': 'accepted'}]}`.
         """
         client_id = request.headers.get('clientId')
-        app.logger.info(f'get response "%s" (%s)', client_id, request.remote_addr)
+        app.logger.info('get response "%s" (%s)', client_id, request.remote_addr)
 
-        response = app.redis.hgetall(f'response:{client_id}')
-        if response is None:
-            return {'response': []}
+        responses = []
 
-        app.redis.delete(f'response:{client_id}')
+        # save keys for responses to array, fetch responses and delete keys
+        # This could be achieved smoother using scan_iter, but fakeredis
+        # does not support scan + delete in same loop
+        _, keys = app.redis.scan(0, f'response:{client_id}:*', count=10)
+        for key in keys:
+            responses.append(app.redis.hgetall(key))
+            app.redis.delete(key)
 
-        return {'response': response}
+        return {'responses': responses}
 
     def post(self):
         """Send a message from a client to a user.
@@ -127,6 +131,6 @@ class Response(Resource):
 
         public_id = RedisMap.get_public_id(args.user_id)
 
-        app.redis.hmset(f'response:{client_id}', {'response': args.response, 'public_id': public_id})
+        app.redis.hmset(f'response:{client_id}:{args.user_id}', {'response': args.response, 'public_id': public_id})
 
         return {'success': True}

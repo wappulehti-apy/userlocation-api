@@ -54,6 +54,15 @@ class Message(Resource):
     parser.add_argument('message', type=str, required=True)
 
     def get(self):
+        """Get response to client.
+
+        .. :quickref: Message; Get users response to client.
+
+        If a response to the clients message exists, it is returned. The returned message
+        is removed and is not returned on subsequent requests.
+
+        :>json object response: response. Eg. :code:`{'response': {'public_id': 'abc123', 'response': 'accepted'}}`.
+        """
         client_id = request.headers.get('clientId')
         app.logger.info(f'get response "%s" (%s)', client_id, request.remote_addr)
 
@@ -66,6 +75,15 @@ class Message(Resource):
         return {'response': response}
 
     def post(self):
+        """Send a message from a client to a user.
+
+        .. :quickref: Message; Send a message from a client to a user.
+
+        :reqheader clientId: Unique client ID. Min length 25 characters.
+        :<json string public_id: Public ID of user to send message to.
+        :<json string message: Message.
+        :>json bool success: True if request was succesful.
+        """
         client_id = request.headers.get('clientId')
         validate_client_id(client_id)
 
@@ -90,6 +108,16 @@ class Response(Resource):
     parser.add_argument('response', type=str, required=True)
 
     def post(self, client_id):
+        """Respond to client message.
+
+        .. :quickref: Message; Respond to client message.
+
+        :reqheader Authorization: Basic <myusername>:<mypassword>.
+        :param client_id: ID of receiving client.
+        :<json string user_id: User ID of responding user.
+        :<json string response: Response message.
+        :>json bool success: True if request was succesful.
+        """
         validate_client_id(client_id)
 
         args = self.parser.parse_args()

@@ -25,6 +25,14 @@ class LocationList(Resource):
     parser.add_argument('latitude', type=float, default=60.0)
 
     def get(self):
+        """List user locations.
+
+        .. :quickref: User Location; List user locations.
+
+        :query float longitude: (optional) Longitude around which to fetch users.
+        :query float latitude: (optional) Latitude around which to fetch users.
+        :>json List[object] users: User list
+        """
         app.logger.info('location query from %s', request.remote_addr)
         args = self.parser.parse_args()
         validate_location(args.longitude, args.latitude)
@@ -45,6 +53,17 @@ class Location(Resource):
     parser.add_argument('nick', type=str, help='nick for user, eg. "bob"', required=True)
 
     def post(self, user_id):
+        """Add or update user location.
+
+        .. :quickref: User Location; Add or update user location.
+
+        :reqheader Authorization: Basic <myusername>:<mypassword>.
+        :param int user_id: User ID.
+        :query float longitude: Longitude around which to fetch users.
+        :query float latitude: Latitude around which to fetch users.
+        :query string nick: Nickname or alias for user.
+        :>json bool success: True if request was succesful.
+        """
         app.logger.info('update location "%s" (%s)', user_id, request.remote_addr)
 
         args = self.parser.parse_args()
@@ -55,6 +74,15 @@ class Location(Resource):
         return {'success': True}
 
     def delete(self, user_id):
+        """Remove user and location.
+
+        .. :quickref: User Location; Remove user location.
+        .. note:: Locations are also expired automatically after a given period.
+
+        :reqheader Authorization: Basic <myusername>:<mypassword>.
+        :param int user_id: User ID.
+        :>json bool success: True if request was succesful.
+        """
         app.logger.info('remove location "%s" (%s)', user_id, request.remote_addr)
 
         redis_map.remove_user_location(user_id)

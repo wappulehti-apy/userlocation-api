@@ -4,17 +4,8 @@ from unittest.mock import patch, MagicMock
 from helpers import with_auth
 
 
-def test_set_requires_authentication(client):
-    r = client.post('/locations/123')
-    assert r.status == '401 UNAUTHORIZED'
-
-
-def test_set_authentication_works(client):
-    r = client.post(f'/locations/123?latitude=60.0&longitude=24.0&nick=B%20A', headers=with_auth())
-    assert r.status == '200 OK'
-
-
-def test_response_is_json(client):
+# get /locations
+def test_get_response_is_json(client):
     r = client.get('/locations', headers=with_auth())
     assert r.headers["Content-Type"] == "application/json"
 
@@ -32,7 +23,32 @@ def test_get_locations_near_given_coordinates(client, map_with_data):
     assert r.get_json() == {'users': []}
 
 
-def test_set_location(client, redis_map, redis_conn):
+def test_get_empty_response(client):
+    r = client.get('/locations')
+    assert r.get_json() == {'users': []}
+
+
+def test_get_response_schema(client, map_with_data):
+    """Checks that output is as expected."""
+    r = client.get('/locations')
+    assert r.get_json() == {'users': [
+        {'public_id': 'hashof1', 'nick': 'Abe', 'location': {'lat': 60.16952, 'lon': 24.93545}},
+        {'public_id': 'hashof2', 'nick': 'Bob', 'location': {'lat': 59.33258, 'lon': 18.0649}}
+    ]}
+
+
+# post /locations
+def test_post_requires_authentication(client):
+    r = client.post('/locations/123')
+    assert r.status == '401 UNAUTHORIZED'
+
+
+def test_post_authentication_works(client):
+    r = client.post(f'/locations/123?latitude=60.0&longitude=24.0&nick=B%20A', headers=with_auth())
+    assert r.status == '200 OK'
+
+
+def test_post_location(client, redis_map, redis_conn):
     user_id = 123
     data = {
         'latitude': 60.16952,
@@ -48,7 +64,7 @@ def test_set_location(client, redis_map, redis_conn):
     assert redis_conn.get('nick:hashof123') == 'Changed'
 
 
-def test_set_location_validates_arg_presence(client, redis_map, redis_conn):
+def test_post_location_validates_arg_presence(client, redis_map, redis_conn):
     r = client.post(f'/locations/123', json={'foo': 'bar', 'nick': 'Abe'}, headers=with_auth())
     json = r.get_json()
 
@@ -57,7 +73,7 @@ def test_set_location_validates_arg_presence(client, redis_map, redis_conn):
     assert json['message'].startswith('invalid longitude')
 
 
-def test_set_location_validates_arg_type(client, redis_map, redis_conn):
+def test_post_location_validates_arg_type(client, redis_map, redis_conn):
     r = client.post(f'/locations/123', json={'longitude': 'foo', 'latitude': 'bar', 'nick': 'Abe'}, headers=with_auth())
     json = r.get_json()
 
@@ -66,7 +82,7 @@ def test_set_location_validates_arg_type(client, redis_map, redis_conn):
     assert json['message'].startswith('invalid longitude: please specify longitude in format')
 
 
-def test_set_location_validates_coordnates(client, redis_map, redis_conn):
+def test_post_location_validates_coordnates(client, redis_map, redis_conn):
     # Valid coordinates
     r = client.post(f'/locations/123', json={'longitude': 24.93545, 'latitude': 60.16952, 'nick': 'Abe'}, headers=with_auth())
     assert r.status == '200 OK'
@@ -94,7 +110,7 @@ def test_tests_dont_leak(client, redis_conn):
 #     pass
 
 
-def test_set_location_updates_existing(client, redis_map, map_with_data):
+def test_post_location_updates_existing(client, redis_map, map_with_data):
     original = redis_map.get_locations_named(24, 60)[0]
     assert original.coordinate.longitude == 24.93545
     assert original.nick == "Abe"
@@ -109,20 +125,7 @@ def test_set_location_updates_existing(client, redis_map, map_with_data):
     assert new.nick == "Changed"
 
 
-def test_empty_response(client):
-    r = client.get('/locations')
-    assert r.get_json() == {'users': []}
-
-
-def test_response_schema(client, map_with_data):
-    """Checks that output is as expected."""
-    r = client.get('/locations')
-    assert r.get_json() == {'users': [
-        {'public_id': 'hashof1', 'nick': 'Abe', 'location': {'lat': 60.16952, 'lon': 24.93545}},
-        {'public_id': 'hashof2', 'nick': 'Bob', 'location': {'lat': 59.33258, 'lon': 18.0649}}
-    ]}
-
-
+# delete /locations
 def test_remove_location(client, redis_map, redis_conn, map_with_data):
     assert len(redis_conn.data['loc']) == 2
     r = client.delete(f'/locations/1', headers=with_auth())

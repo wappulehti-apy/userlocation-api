@@ -164,15 +164,15 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Message</p></td>
-<td><p><a class="reference external" href="#get--message">GET /message</a></p></td>
-<td><p>Get users response to client.</p></td>
+<td><p><a class="reference external" href="#get--messages">GET /messages</a></p></td>
+<td><p>Get users responses to client.</p></td>
 </tr>
 <tr class="row-odd"><td></td>
-<td><p><a class="reference external" href="#post--message">POST /message</a></p></td>
+<td><p><a class="reference external" href="#post--messages">POST /messages</a></p></td>
 <td><p>Send a message from a client to a user.</p></td>
 </tr>
 <tr class="row-even"><td></td>
-<td><p><a class="reference external" href="#post--message-(string-client_id)">POST /message/(string:client_id)</a></p></td>
+<td><p><a class="reference external" href="#post--messages-(string-client_id)">POST /messages/(string:client_id)</a></p></td>
 <td><p>Respond to client message.</p></td>
 </tr>
 <tr class="row-odd"><td><p>User Location</p></td>
@@ -269,23 +269,23 @@
 </dd></dl>
 
 <dl class="get">
-<dt id="get--message">
-<code class="sig-name descname">GET </code><code class="sig-name descname">/message</code><a class="headerlink" href="#get--message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get response to client.</p>
-<p>If a response to the clients message exists, it is returned. The returned message
-is removed and is not returned on subsequent requests.</p>
+<dt id="get--messages">
+<code class="sig-name descname">GET </code><code class="sig-name descname">/messages</code><a class="headerlink" href="#get--messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get responses to client.</p>
+<p>If a response to the clients message exists, it is returned. The returned messages
+are removed and are not returned on subsequent requests.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Response JSON Object</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>response</strong> (<em>object</em>) – response. Eg. <code class="code docutils literal notranslate"><span class="pre">{'response':</span> <span class="pre">{'public_id':</span> <span class="pre">'abc123',</span> <span class="pre">'response':</span> <span class="pre">'accepted'}}</span></code>.</p></li>
+<li><p><strong>responses</strong> (<em>List[string]</em>) – list of <em>string</em> responses. Eg. <code class="code docutils literal notranslate"><span class="pre">{'responses':</span> <span class="pre">[{'public_id':</span> <span class="pre">'abc123',</span> <span class="pre">'response':</span> <span class="pre">'accepted'}]}</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="post">
-<dt id="post--message">
-<code class="sig-name descname">POST </code><code class="sig-name descname">/message</code><a class="headerlink" href="#post--message" title="Permalink to this definition">¶</a></dt>
+<dt id="post--messages">
+<code class="sig-name descname">POST </code><code class="sig-name descname">/messages</code><a class="headerlink" href="#post--messages" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a message from a client to a user.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Request Headers</dt>
@@ -308,8 +308,8 @@ is removed and is not returned on subsequent requests.</p>
 </dd></dl>
 
 <dl class="post">
-<dt id="post--message-(string-client_id)">
-<code class="sig-name descname">POST </code><code class="sig-name descname">/message/</code><span class="sig-paren">(</span><em class="property">string: </em><em class="sig-param">client_id</em><span class="sig-paren">)</span><a class="headerlink" href="#post--message-(string-client_id)" title="Permalink to this definition">¶</a></dt>
+<dt id="post--messages-(string-client_id)">
+<code class="sig-name descname">POST </code><code class="sig-name descname">/messages/</code><span class="sig-paren">(</span><em class="property">string: </em><em class="sig-param">client_id</em><span class="sig-paren">)</span><a class="headerlink" href="#post--messages-(string-client_id)" title="Permalink to this definition">¶</a></dt>
 <dd><p>Respond to client message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Request Headers</dt>

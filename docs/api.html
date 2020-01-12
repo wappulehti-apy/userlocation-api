@@ -164,12 +164,12 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Message</p></td>
-<td><p><a class="reference external" href="#get--message">GET /message</a></p></td>
-<td><p>Get users response to client.</p></td>
-</tr>
-<tr class="row-odd"><td></td>
 <td><p><a class="reference external" href="#post--message">POST /message</a></p></td>
 <td><p>Send a message from a client to a user.</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p><a class="reference external" href="#get--message">GET /message</a></p></td>
+<td><p>Get users response to client.</p></td>
 </tr>
 <tr class="row-even"><td></td>
 <td><p><a class="reference external" href="#post--message-(string-client_id)">POST /message/(string:client_id)</a></p></td>
@@ -267,21 +267,6 @@
 </dl>
 </dd></dl>
 
-<dl class="get">
-<dt id="get--message">
-<code class="sig-name descname">GET </code><code class="sig-name descname">/message</code><a class="headerlink" href="#get--message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get response to client.</p>
-<p>If a response to the clients message exists, it is returned. The returned message
-is removed and is not returned on subsequent requests.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Response JSON Object</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>response</strong> (<em>object</em>) – response. Eg. <code class="code docutils literal notranslate"><span class="pre">{'response':</span> <span class="pre">{'public_id':</span> <span class="pre">'abc123',</span> <span class="pre">'response':</span> <span class="pre">'accepted'}}</span></code>.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="post">
 <dt id="post--message">
 <code class="sig-name descname">POST </code><code class="sig-name descname">/message</code><a class="headerlink" href="#post--message" title="Permalink to this definition">¶</a></dt>
@@ -301,6 +286,21 @@ is removed and is not returned on subsequent requests.</p>
 <dt class="field-odd">Response JSON Object</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>success</strong> (<em>bool</em>) – True if request was succesful.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--message">
+<code class="sig-name descname">GET </code><code class="sig-name descname">/message</code><a class="headerlink" href="#get--message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get response to client.</p>
+<p>If a response to the clients message exists, it is returned. The returned message
+is removed and is not returned on subsequent requests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Response JSON Object</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response</strong> (<em>object</em>) – response. Eg. <code class="code docutils literal notranslate"><span class="pre">{'response':</span> <span class="pre">{'public_id':</span> <span class="pre">'abc123',</span> <span class="pre">'response':</span> <span class="pre">'accepted'}}</span></code>.</p></li>
 </ul>
 </dd>
 </dl>

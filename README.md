@@ -18,6 +18,7 @@ API reference is available in the [project docs](https://wappulehti-apy.github.i
 
 To run locally, do
 ```bash
+cp .env.sample .env
 docker-compose up --build
 ```
 

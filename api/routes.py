@@ -29,5 +29,5 @@ def init_app(app):
     from . import location, message
     api.add_resource(location.LocationList, '/locations')
     api.add_resource(location.Location, '/locations/<int:user_id>')
-    api.add_resource(message.Message, '/message')
-    api.add_resource(message.Response, '/message/<string:client_id>')
+    api.add_resource(message.Message, '/messages')
+    api.add_resource(message.Response, '/messages/<string:client_id>')

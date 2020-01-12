@@ -71,7 +71,7 @@
         const i = event.target.dataset.case;
         // xhr with dummy user and pw
         xhr.open(testCases[i][0], testCases[i][1], true, 'user', 'password');
-        if (testCases[i][1].startsWith('/message')) {
+        if (testCases[i][1].startsWith('/messages')) {
           // add clientId if needed
           xhr.setRequestHeader('clientId','atotallyrandomassignedstring')
         }

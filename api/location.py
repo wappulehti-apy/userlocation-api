@@ -2,17 +2,20 @@ from api.auth import basic_auth
 from api.limiter import rate_limiter
 from redismap import redis_map
 from flask import current_app as app
-from flask import request
+from flask import request, abort
 from flask_restful import Resource, reqparse
 from werkzeug.exceptions import HTTPException
 
 
-class LocationError(Exception):
+class LocationError(ValueError):
     pass
 
 
 def validate_location(longitude, latitude):
-    pass
+    if longitude < -180 or longitude > 180:
+        abort(400, description='invalid longitude: Must be between -180 and 180.')
+    if latitude < -90 or latitude > 90:
+        abort(400, description='invalid latitude: Must be between -90 and 90.')
 
 
 class LocationList(Resource):

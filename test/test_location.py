@@ -57,6 +57,15 @@ def test_set_location_validates_arg_presence(client, redis_map, redis_conn):
     assert json['message'].startswith('invalid longitude')
 
 
+def test_set_location_validates_arg_type(client, redis_map, redis_conn):
+    r = client.post(f'/locations/123', json={'longitude': 'foo', 'latitude': 'bar', 'nick': 'Abe'}, headers=with_auth())
+    json = r.get_json()
+
+    assert r.status == '400 BAD REQUEST'
+    assert json['error']
+    assert json['message'].startswith('invalid longitude: please specify longitude in format')
+
+
 def test_set_location_validates_coordnates(client, redis_map, redis_conn):
     # Valid coordinates
     r = client.post(f'/locations/123', json={'longitude': 24.93545, 'latitude': 60.16952, 'nick': 'Abe'}, headers=with_auth())
@@ -67,13 +76,13 @@ def test_set_location_validates_coordnates(client, redis_map, redis_conn):
     json = r.get_json()
     assert r.status == '400 BAD REQUEST'
     assert json['error']
-    assert json['message'].startswith('Bad Request: invalid longitude')
+    assert json['message'].startswith('invalid longitude')
 
     # Invalid latitude
     r = client.post(f'/locations/123', json={'longitude': 24.93545, 'latitude': 91.000000, 'nick': 'Abe'}, headers=with_auth())
     json = r.get_json()
     assert r.status == '400 BAD REQUEST'
-    assert json['message'].startswith('Bad Request: invalid latitude')
+    assert json['message'].startswith('invalid latitude')
 
 
 def test_tests_dont_leak(client, redis_conn):

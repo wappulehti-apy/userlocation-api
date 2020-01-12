@@ -7,10 +7,10 @@ from werkzeug.exceptions import HTTPException
 class ExtendedApi(Api):
     def handle_error(self, err):
         """Extended error response formatting."""
-        response = {'error': True}
+        response = {'error': True, 'title': err.name}
         if isinstance(err, HTTPException):
             if 'description' in err.__dict__:
-                response['message'] = f'{err.name}: {err.__dict__.get("description")}'
+                response['message'] = err.__dict__.get("description")
             elif 'data' in err.__dict__:
                 msg = err.data.get('message')
                 if (isinstance(msg, dict)):

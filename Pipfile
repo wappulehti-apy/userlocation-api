@@ -9,6 +9,8 @@ pytest = "*"
 pytest-env = "*"
 fakeredis = "*"
 sphinx = "*"
+sphinxcontrib-httpdomain = "*"
+sphinx-rtd-theme = "*"
 
 [packages]
 flask = "*"

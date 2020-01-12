@@ -164,12 +164,12 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Message</p></td>
-<td><p><a class="reference external" href="#get--messages">GET /messages</a></p></td>
-<td><p>Get users responses to client.</p></td>
-</tr>
-<tr class="row-odd"><td></td>
 <td><p><a class="reference external" href="#post--messages">POST /messages</a></p></td>
 <td><p>Send a message from a client to a user.</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p><a class="reference external" href="#get--messages">GET /messages</a></p></td>
+<td><p>Get users responses to client.</p></td>
 </tr>
 <tr class="row-even"><td></td>
 <td><p><a class="reference external" href="#post--messages-(string-client_id)">POST /messages/(string:client_id)</a></p></td>
@@ -180,12 +180,12 @@
 <td><p>List user locations.</p></td>
 </tr>
 <tr class="row-even"><td></td>
-<td><p><a class="reference external" href="#delete--locations-(int-user_id)">DELETE /locations/(int:user_id)</a></p></td>
-<td><p>Remove user location.</p></td>
-</tr>
-<tr class="row-odd"><td></td>
 <td><p><a class="reference external" href="#post--locations-(int-user_id)">POST /locations/(int:user_id)</a></p></td>
 <td><p>Add or update user location.</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p><a class="reference external" href="#delete--locations-(int-user_id)">DELETE /locations/(int:user_id)</a></p></td>
+<td><p>Remove user location.</p></td>
 </tr>
 </tbody>
 </table>
@@ -206,33 +206,6 @@
 <dt class="field-even">Response JSON Object</dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>users</strong> (<em>List[object]</em>) – User list</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="delete">
-<dt id="delete--locations-(int-user_id)">
-<code class="sig-name descname">DELETE </code><code class="sig-name descname">/locations/</code><span class="sig-paren">(</span><em class="property">int: </em><em class="sig-param">user_id</em><span class="sig-paren">)</span><a class="headerlink" href="#delete--locations-(int-user_id)" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove user and location.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Locations are also expired automatically after a given period.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Request Headers</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><a class="reference external" href="https://tools.ietf.org/html/rfc7235#section-4.2">Authorization</a> – Basic &lt;myusername&gt;:&lt;mypassword&gt;.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Parameters</dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>user_id</strong> (<em>int</em>) – User ID.</p></li>
-</ul>
-</dd>
-<dt class="field-odd">Response JSON Object</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>success</strong> (<em>bool</em>) – True if request was succesful.</p></li>
 </ul>
 </dd>
 </dl>
@@ -268,16 +241,28 @@
 </dl>
 </dd></dl>
 
-<dl class="get">
-<dt id="get--messages">
-<code class="sig-name descname">GET </code><code class="sig-name descname">/messages</code><a class="headerlink" href="#get--messages" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get responses to client.</p>
-<p>If a response to the clients message exists, it is returned. The returned messages
-are removed and are not returned on subsequent requests.</p>
+<dl class="delete">
+<dt id="delete--locations-(int-user_id)">
+<code class="sig-name descname">DELETE </code><code class="sig-name descname">/locations/</code><span class="sig-paren">(</span><em class="property">int: </em><em class="sig-param">user_id</em><span class="sig-paren">)</span><a class="headerlink" href="#delete--locations-(int-user_id)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove user and location.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Locations are also expired automatically after a given period.</p>
+</div>
 <dl class="field-list simple">
+<dt class="field-odd">Request Headers</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="https://tools.ietf.org/html/rfc7235#section-4.2">Authorization</a> – Basic &lt;myusername&gt;:&lt;mypassword&gt;.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) – User ID.</p></li>
+</ul>
+</dd>
 <dt class="field-odd">Response JSON Object</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>responses</strong> (<em>List[string]</em>) – list of <em>string</em> responses. Eg. <code class="code docutils literal notranslate"><span class="pre">{'responses':</span> <span class="pre">[{'public_id':</span> <span class="pre">'abc123',</span> <span class="pre">'response':</span> <span class="pre">'accepted'}]}</span></code>.</p></li>
+<li><p><strong>success</strong> (<em>bool</em>) – True if request was succesful.</p></li>
 </ul>
 </dd>
 </dl>
@@ -302,6 +287,21 @@ are removed and are not returned on subsequent requests.</p>
 <dt class="field-odd">Response JSON Object</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>success</strong> (<em>bool</em>) – True if request was succesful.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--messages">
+<code class="sig-name descname">GET </code><code class="sig-name descname">/messages</code><a class="headerlink" href="#get--messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get responses to client.</p>
+<p>If a response to the clients message exists, it is returned. The returned messages
+are removed and are not returned on subsequent requests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Response JSON Object</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>responses</strong> (<em>List[string]</em>) – list of <em>string</em> responses. Eg. <code class="code docutils literal notranslate"><span class="pre">{'responses':</span> <span class="pre">[{'public_id':</span> <span class="pre">'abc123',</span> <span class="pre">'response':</span> <span class="pre">'accepted'}]}</span></code>.</p></li>
 </ul>
 </dd>
 </dl>

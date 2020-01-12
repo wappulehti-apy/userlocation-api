@@ -8,7 +8,7 @@ An API built to serve two purposes:
 
 A proven example use case is listing locations of sellers on a hyperlocal map, and allowing customers (clients)
 to request a callback phonecall from a user of their choice.
-A fully working system requires an additional way of relying messages to and from clients, that is implemented
+A fully working system requires an additional way of relying messages to and from users, that is implemented
 as a webhook. The webhook is called by the User Location API.
 
 .. project-description-end

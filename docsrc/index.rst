@@ -20,3 +20,8 @@ as a webhook. The webhook is called by the User Location API.
 
    self
    api
+
+Other:
+------
+
+- `Project repository on GitHub <https://github.com/wappulehti-apy/userlocation-api/>`_.

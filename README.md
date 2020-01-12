@@ -10,6 +10,9 @@ to request a callback phonecall from a user of their choice.
 A fully working system requires an additional way of relying messages to and from clients, that is implemented
 as a webhook. The webhook is called by the User Location API.
 
+## Documentation
+
+API reference is available in the [project docs](https://wappulehti-apy.github.io/userlocation-api/index.html).
 
 ## Running locally (docker)
 

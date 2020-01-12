@@ -38,8 +38,9 @@ heroku config:set BASIC_AUTH_PASSWORD=<mypassword>
 heroku config:set FLASK_SECRET_KEY=<mysecretkey>
 heroku config:set SALT=<mysecretsalt>
 heroku config:set WEBHOOK_URL=<mymessagewebhookurl>
+heroku config:set CORS_ORIGINS=http://mywebsite.com,localhost:5000
 ```
-These can be chosen arbitrarily, as long as they are sufficiently long.
+Most of these can be chosen arbitrarily, as long as they are sufficiently long.
 
 ### Deployment using git
 
@@ -74,6 +75,16 @@ pipenv run lint
 Run tests
 ```bash
 pipenv run pytest
+```
+
+Generate docs (local)
+```bash
+cd docsrc/;pipenv run make html
+```
+
+Generate docs (build)
+```bash
+cd docsrc/;pipenv run make github
 ```
 
 ## License

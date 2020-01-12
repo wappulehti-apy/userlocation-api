@@ -21,3 +21,5 @@ test/
 .env
 requirements-dev.txt
 README.md
+docs/
+docsrc/

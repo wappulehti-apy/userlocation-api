@@ -61,6 +61,7 @@ class Message(Resource):
         If a response to the clients message exists, it is returned. The returned messages
         are removed and are not returned on subsequent requests.
 
+        :reqheader clientId: Unique client ID. Min length 25 characters.
         :>json List[string] responses: list of *string* responses. Eg. :code:`{'responses': [{'public_id': 'abc123', 'response': 'accepted'}]}`.
         """
         client_id = request.headers.get('clientId')

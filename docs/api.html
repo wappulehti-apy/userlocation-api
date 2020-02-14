@@ -299,8 +299,13 @@
 <p>If a response to the clients message exists, it is returned. The returned messages
 are removed and are not returned on subsequent requests.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Response JSON Object</dt>
+<dt class="field-odd">Request Headers</dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><em>clientId</em> – Unique client ID. Min length 25 characters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Response JSON Object</dt>
+<dd class="field-even"><ul class="simple">
 <li><p><strong>responses</strong> (<em>List[string]</em>) – list of <em>string</em> responses. Eg. <code class="code docutils literal notranslate"><span class="pre">{'responses':</span> <span class="pre">[{'public_id':</span> <span class="pre">'abc123',</span> <span class="pre">'response':</span> <span class="pre">'accepted'}]}</span></code>.</p></li>
 </ul>
 </dd>

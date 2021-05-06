@@ -1,28 +1,28 @@
--i https://pypi.org/simple
-aniso8601==8.0.0
+-i https://pypi.org/simple/
+aniso8601==9.0.1
 apscheduler==3.6.3
-certifi==2019.11.28
+certifi==2020.12.5
 chardet==3.0.4
-click==7.0
+click==7.1.2
 flask-basicauth==0.2.0
-flask-cors==3.0.8
+flask-cors==3.0.9
 flask-limiter==1.1.0
 flask-restful==0.3.7
 flask==1.1.1
 gevent==1.4.0
-greenlet==0.4.15 ; platform_python_implementation == 'CPython'
+greenlet==1.1.0 ; platform_python_implementation == 'CPython'
 gunicorn==20.0.4
 hashids==1.2.0
 idna==2.8
 itsdangerous==1.1.0
-jinja2==2.10.3
-limits==1.4.1
+jinja2==2.11.3
+limits==1.5.1
 markupsafe==1.1.1
 python-dotenv==0.10.3
-pytz==2019.3
+pytz==2021.1
 redis==3.3.11
 requests==2.22.0
-six==1.13.0
-tzlocal==2.0.0
-urllib3==1.25.7
-werkzeug==0.16.0
+six==1.16.0
+tzlocal==2.1
+urllib3==1.25.11
+werkzeug==1.0.1

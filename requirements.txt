@@ -1,7 +1,7 @@
 -i https://pypi.org/simple
 aniso8601==8.0.0
 apscheduler==3.6.3
-certifi==2019.11.28
+certifi==2022.12.7
 chardet==3.0.4
 click==7.0
 flask-basicauth==0.2.0
